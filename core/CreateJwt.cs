@@ -33,8 +33,8 @@ public class JwtService
             }),
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keys), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = "GoArif.com",
-            Audience = "GoArif.com",
+            Issuer = "Twillink.com",
+            Audience = "Twillink.com",
         };
 
         return tokenDescriptor;
