@@ -11,19 +11,19 @@ namespace SendingEmail
         private readonly string Port;
         public EmailService(IConfiguration configuration)
         {
-            this.Email = configuration.GetSection("EmailSmtp")["Email"];
-            this.PW = configuration.GetSection("EmailSmtp")["PW"];
-            this.SMTP = configuration.GetSection("EmailSmtp")["SMTP"];
-            this.Port = configuration.GetSection("EmailSmtp")["Port"];
+            // this.Email = configuration.GetSection("EmailSmtp")["Email"];
+            // this.PW = configuration.GetSection("EmailSmtp")["PW"];
+            // this.SMTP = configuration.GetSection("EmailSmtp")["SMTP"];
+            // this.Port = configuration.GetSection("EmailSmtp")["Port"];
         }
         public async Task SendEmailAsync(EmailForm model)
         {
             try
             {
-                var email = Email;
-                var password = PW;
+                var email = "no-reply@coderchamps.co.id";
+                var password = "hgzzbtjqvbbovjvr";
 
-                var client = new SmtpClient(SMTP, int.Parse(Port))
+                var client = new SmtpClient("smtp.gmail.com", 587)
                 {
                     EnableSsl = true,
                     Credentials = new NetworkCredential(email, password)
