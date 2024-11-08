@@ -18,10 +18,6 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.Configure(builder.Configuration.GetSection("Kestrel"));
-});
 
 builder.Services.AddSingleton<ConvertJWT>();
 builder.Services.AddSingleton<ValidationUserDto>();
