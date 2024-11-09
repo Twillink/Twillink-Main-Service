@@ -338,7 +338,9 @@ namespace RepositoryPattern.Services.AuthService
             {
                 var userOtp = await dataUser.Find(x => x.Email == email).FirstOrDefaultAsync();
                 if (userOtp == null)
-                    throw new CustomException(400,"Message","Otp not found");
+                {
+                    return "Email Not Found";
+                }
                 return "Available";
             }
             catch (Exception ex)
