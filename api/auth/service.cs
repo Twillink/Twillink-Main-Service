@@ -85,6 +85,7 @@ namespace RepositoryPattern.Services.AuthService
                 {
                     throw new CustomException(400, "Username", "Username Sudah digunakan");
                 }
+                
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(data.Password);
                 var uuid = Guid.NewGuid().ToString();
 
@@ -122,7 +123,7 @@ namespace RepositoryPattern.Services.AuthService
             catch (CustomException ex)
             {
 
-                throw;
+                throw new CustomException(400, "Error", ex.Message);;
             }
         }
 
