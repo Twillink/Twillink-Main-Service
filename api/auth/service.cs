@@ -81,7 +81,7 @@ namespace RepositoryPattern.Services.AuthService
                 }
 
                 var items = await dataUser.Find(_ => _.Username == data.Username).FirstOrDefaultAsync();
-                if( user.Username != null)
+                if( items.Username != null)
                 {
                     throw new CustomException(400, "Username", "Username Sudah digunakan");
                 }
