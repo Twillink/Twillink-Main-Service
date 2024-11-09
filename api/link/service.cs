@@ -21,7 +21,12 @@ namespace RepositoryPattern.Services.LinkUrlService
             try
             {
                 var items = await dataUser.Find(_ => _.Username == UserName).FirstOrDefaultAsync();
-                return new { code = 200, data = items, message = "Available" };
+                if(items == null)
+                {
+                    return new { code = 200, message = "Available" };
+                }else{
+                    return new { code = 200, message = "Not Available" };
+                }
             }
             catch (CustomException)
             {
