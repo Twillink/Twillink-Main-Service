@@ -307,12 +307,13 @@ namespace RepositoryPattern.Services.AuthService
                 var newPassword = dto.Password;
 
                 // Cek OTP di database
-                var userOtp = await dataOtp.Find(x => x.CodeOtp == codeOtp).FirstOrDefaultAsync();
+                var userOtp = await dataOtp.Find(x => x.CodeOtp.Equals(dto.CodeOtp, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefaultAsync();
+
                 if (userOtp == null)
                     throw new CustomException(400,"Message", "Otp not found");
 
                 // Cari user berdasarkan email dari OTP
-                var roleData = await dataUser.Find(x => x.Email == userOtp.Email).FirstOrDefaultAsync();
+                var roleData = await dataUser.Find(x => x.Email.Equals(userOtp.Email, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefaultAsync();
                 if (roleData == null)
                     throw new CustomException(400,"Message", "User not found");
 
