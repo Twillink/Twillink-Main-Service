@@ -80,12 +80,6 @@ namespace RepositoryPattern.Services.AuthService
                     throw new CustomException(400, "Email", "Email Sudah digunakan");
                 }
 
-                var items = await dataUser.Find(_ => _.Username == data.Username).FirstOrDefaultAsync();
-                if( items.Username != null)
-                {
-                    throw new CustomException(400, "Username", "Username Sudah digunakan");
-                }
-                
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(data.Password);
                 var uuid = Guid.NewGuid().ToString();
 
