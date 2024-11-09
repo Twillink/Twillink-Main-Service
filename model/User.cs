@@ -16,6 +16,11 @@ namespace Twillink.Shared.Models
         [BsonElement("Password")]
         public string? Password {get; set;}
 
+        [BsonElement("FullName")]
+        public string? FullName {get; set;}
+        [BsonElement("PhoneNumber")]
+        public string? PhoneNumber {get; set;}
+
         [BsonElement("Image")]
         public string? Image {get; set;}
 

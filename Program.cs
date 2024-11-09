@@ -6,7 +6,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using twillink.Shared.ViewModels;
 using RepositoryPattern.Services.AuthService;
+using RepositoryPattern.Services.OtpService;
 using SendingEmail;
+using RepositoryPattern.Services.LinkUrlService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<ILinkUrlService, LinkUrlService>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

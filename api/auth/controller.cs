@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Twillink.Server.Controllers
 {
     [ApiController]
-    [Route("api/v1/")]
+    [Route("api/v1/user-auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _IAuthService;
@@ -27,7 +27,31 @@ namespace Twillink.Server.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("auth/login")]
+        [Route("register")]
+        public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto login)
+        {
+            try
+            {
+                var validationErrors = _masterValidationService.ValidateRegister(login);
+                if (validationErrors.Count > 0)
+                {
+                    var errorResponse = new { code = 400, errorMessage = validationErrors };
+                    return BadRequest(errorResponse);
+                }
+                var dataList = await _IAuthService.RegisterAsync(login);
+                return Ok(dataList);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+        
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("login")]
         public async Task<object> LoginAsync([FromBody] LoginDto login)
         {
             try
@@ -49,20 +73,13 @@ namespace Twillink.Server.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost]
-        [Route("auth/register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto login)
+        [Route("forgot-password")]
+        public async Task<object> ForgotPassword([FromBody] UpdateUserAuthDto item)
         {
             try
             {
-                var validationErrors = _masterValidationService.ValidateRegister(login);
-                if (validationErrors.Count > 0)
-                {
-                    var errorResponse = new { code = 400, errorMessage = validationErrors };
-                    return BadRequest(errorResponse);
-                }
-                var dataList = await _IAuthService.RegisterAsync(login);
+                var dataList = await _IAuthService.ForgotPasswordAsync(item);
                 return Ok(dataList);
             }
             catch (CustomException ex)
@@ -75,19 +92,13 @@ namespace Twillink.Server.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("auth/updatePassword")]
-        public async Task<object> UpdatePassword([FromBody] UpdatePasswordDto item)
+        [Route("change-password")]
+        public async Task<object> UpdatePassword([FromBody] ChangeUserPasswordDto item)
         {
             try
             {
                 string accessToken = HttpContext.Request.Headers["Authorization"];
                 string idUser = await _ConvertJwt.ConvertString(accessToken);
-                var validationErrors = _masterValidationService.ValidateUpdatePassword(item);
-                if (validationErrors.Count > 0)
-                {
-                    var errorResponse = new { code = 400, errorMessage = validationErrors };
-                    return BadRequest(errorResponse);
-                }
                 var dataList = await _IAuthService.UpdatePassword(idUser, item);
                 return Ok(dataList);
             }
@@ -99,32 +110,13 @@ namespace Twillink.Server.Controllers
             }
         }
 
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("auth/verifyOtp")]
-        public async Task<object> VerifyOtp([FromBody] OtpDto otp)
+        [HttpGet]
+        [Route("check-mail-registered/{email}")]
+        public async Task<object> CheckMail([FromRoute] string email)
         {
             try
             {
-                var dataList = await _IAuthService.VerifyOtp(otp);
-                return Ok(dataList);
-            }
-            catch (CustomException ex)
-            {
-                int errorCode = ex.ErrorCode;
-                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
-                return _errorUtility.HandleError(errorCode, errorResponse);
-            }
-        }
-
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("auth/requestOtpEmail")]
-        public async Task<object> RequestOtp([FromBody] ReqOtpDto otp)
-        {
-            try
-            {
-                var dataList = await _IAuthService.RequestOtpEmail(otp.Email);
+                var dataList = await _IAuthService.CheckMail(email);
                 return Ok(dataList);
             }
             catch (CustomException ex)
@@ -137,7 +129,7 @@ namespace Twillink.Server.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        [Route("auth/activation/{UID}")]
+        [Route("activation/{UID}")]
         public async Task<object> VerifySeasonsAsync([FromRoute] string UID)
         {
             try
@@ -155,7 +147,7 @@ namespace Twillink.Server.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("auth/verifySessions")]
+        [Route("verifySessions")]
         public object Aktifasi()
         {
             try

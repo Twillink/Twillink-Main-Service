@@ -72,19 +72,6 @@ public class ValidationAuthDto
             errors["Password"] = "Password must 8 character";
         }
 
-        if (items == null || string.IsNullOrEmpty(items.ConfirmPassword))
-        {
-            errors["ConfirmPassword"] = "ConfirmPassword is a required field.";
-        }
-        else if (items.Password.Length < 8)
-        {
-            errors["ConfirmPassword"] = "ConfirmPassword must 8 character";
-        }
-        else if (items.Password != items.ConfirmPassword)
-        {
-            errors["ConfirmPassword"] = "Password and confirmation do not match.";
-        }
-
         return errors;
     }
 

@@ -15,6 +15,8 @@ namespace RepositoryPattern.Services.AuthService
     public class AuthService : IAuthService
     {
         private readonly IMongoCollection<User> dataUser;
+        private readonly IMongoCollection<OtpModel> dataOtp;
+
         private readonly IEmailService _emailService;
         private readonly string key;
         private readonly ILogger<AuthService> _logger;
@@ -24,6 +26,7 @@ namespace RepositoryPattern.Services.AuthService
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
             IMongoDatabase database = client.GetDatabase("Twillink");
             dataUser = database.GetCollection<User>("Users");
+            dataOtp = database.GetCollection<OtpModel>("Otps");
             this.key = configuration.GetSection("AppSettings")["JwtKey"];
             _emailService = emailService;
             _logger = logger;
@@ -83,6 +86,8 @@ namespace RepositoryPattern.Services.AuthService
                 {
                     Id = uuid,
                     Username = data.Username,
+                    FullName = data.FullName,
+                    PhoneNumber = data.PhoneNumber,
                     Email = data.Email,
                     Password = hashedPassword,
                     IsActive = true,
@@ -111,7 +116,7 @@ namespace RepositoryPattern.Services.AuthService
             }
         }
 
-        public async Task<object> UpdatePassword(string id, UpdatePasswordDto item)
+        public async Task<object> UpdatePassword(string id, ChangeUserPasswordDto item)
         {
             try
             {
@@ -120,14 +125,18 @@ namespace RepositoryPattern.Services.AuthService
                 {
                     throw new CustomException(400, "Error", "Data tidak ada");
                 }
-                if (item.Password.Length < 8)
+                if (roleData.Password != item.currentPassword)
+                {
+                    throw new CustomException(400, "Error", "Data tidak ada");
+                }
+                if (item.newPassword.Length < 8)
                 {
                     throw new CustomException(400, "Password", "Password harus 8 karakter");
                 }
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(item.Password);
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(item.newPassword);
                 roleData.Password = hashedPassword;
                 await dataUser.ReplaceOneAsync(x => x.Id == id, roleData);
-                return new {code = 200, Message= "Update Password Berhasil"};
+                return new { code = 200, Message = "Update Password Berhasil" };
             }
             catch (CustomException ex)
             {
@@ -152,7 +161,7 @@ namespace RepositoryPattern.Services.AuthService
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(item.Pin);
                 roleData.Pin = hashedPassword;
                 await dataUser.ReplaceOneAsync(x => x.Id == id, roleData);
-                return new {code = 200, Message = "Update Pin Berhasil"};
+                return new { code = 200, Message = "Update Pin Berhasil" };
             }
             catch (CustomException ex)
             {
@@ -183,7 +192,7 @@ namespace RepositoryPattern.Services.AuthService
                 var sending = _emailService.SendEmailAsync(emailForm);
                 roleData.Otp = otp;
                 await dataUser.ReplaceOneAsync(x => x.Email == id, roleData);
-                return new {code = 200, Message = "Berhasil"};
+                return new { code = 200, Message = "Berhasil" };
             }
             catch (CustomException ex)
             {
@@ -213,7 +222,7 @@ namespace RepositoryPattern.Services.AuthService
                 var jwtService = new JwtService(configuration);
                 string userId = roleData.Id;
                 string token = jwtService.GenerateJwtToken(userId);
-                return new {code = 200, message =  "Berhasil", accessToken = token};
+                return new { code = 200, message = "Berhasil", accessToken = token };
             }
             catch (CustomException ex)
             {
@@ -234,7 +243,7 @@ namespace RepositoryPattern.Services.AuthService
                 }
                 roleData.IsVerification = true;
                 await dataUser.ReplaceOneAsync(x => x.Id == id, roleData);
-                return new {code = 200, Message ="Email berhasil di verifikasi"};
+                return new { code = 200, Message = "Email berhasil di verifikasi" };
             }
             catch (CustomException ex)
             {
@@ -255,7 +264,7 @@ namespace RepositoryPattern.Services.AuthService
                 {
                     return new CustomException(400, "Message", "Pin Not Set");
                 }
-                return new {code = 200, Message = "Berhasil"};
+                return new { code = 200, Message = "Berhasil" };
             }
             catch (CustomException ex)
             {
@@ -278,11 +287,59 @@ namespace RepositoryPattern.Services.AuthService
                     throw new CustomException(400, "Pin", "Pin Salah");
                 }
                 string idAsString = user.Id.ToString();
-                return new {code = 200, Message = "Berhasil"};
+                return new { code = 200, Message = "Berhasil" };
             }
             catch (CustomException ex)
             {
                 throw;
+            }
+        }
+
+        public async Task<string> ForgotPasswordAsync(UpdateUserAuthDto dto)
+        {
+            try
+            {
+                var codeOtp = dto.CodeOtp;
+                var newPassword = dto.Password;
+
+                // Cek OTP di database
+                var userOtp = await dataOtp.Find(x => x.CodeOtp == codeOtp).FirstOrDefaultAsync();
+                if (userOtp == null)
+                    throw new CustomException(400,"Message", "Otp not found");
+
+                // Cari user berdasarkan email dari OTP
+                var roleData = await dataUser.Find(x => x.Email == userOtp.Email).FirstOrDefaultAsync();
+                if (roleData == null)
+                    throw new CustomException(400,"Message", "User not found");
+
+                // Hash password baru
+                string passwordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                roleData.Password = passwordHash;
+                await dataUser.ReplaceOneAsync(x => x.Id == roleData.Id, roleData);
+                // Hapus OTP setelah berhasil update password
+                await dataOtp.DeleteOneAsync(o => o.Id == userOtp.Id);
+
+                return "Update Password Successfully";
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException(400,"Message", $"ForgotPassword Error: {ex.Message}");
+            }
+        }
+
+        public async Task<string> CheckMail(string email)
+        {
+            try
+            {
+                var userOtp = await dataUser.Find(x => x.Email == email).FirstOrDefaultAsync();
+                if (userOtp == null)
+                    throw new CustomException(400,"Message","Otp not found");
+                return "Available";
+            }
+            catch (Exception ex)
+            {
+
+                throw new CustomException(400,"Message", $"ForgotPassword Error: {ex.Message}");
             }
         }
     }
