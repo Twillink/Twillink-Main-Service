@@ -9,6 +9,8 @@ using RepositoryPattern.Services.AuthService;
 using RepositoryPattern.Services.OtpService;
 using SendingEmail;
 using RepositoryPattern.Services.LinkUrlService;
+using RepositoryPattern.Services.WidgetService;
+using RepositoryPattern.Services.AttachmentService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,10 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<ILinkUrlService, LinkUrlService>();
+builder.Services.AddScoped<IWidgetService, WidgetService>();
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+
+
 
 
 builder.Services.AddControllers();

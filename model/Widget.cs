@@ -2,7 +2,12 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Twillink.Shared.Models
 {
-    public class AddLink : BaseModelUser
+    public class Widget
+    {
+        public object[] WidgetList {get; set;}
+        public object user {get; set;}
+    }
+    public class AddLink : BaseModelUser 
     {
         [BsonId]
         public string? Id {get; set;}
@@ -144,5 +149,14 @@ namespace Twillink.Shared.Models
 
         [BsonElement("Model")]
         public int? Model {get; set;}
+    }
+
+    public class Attachments : BaseModelUser
+    {
+        [BsonId]
+        public string? Id {get; set;}
+
+        [BsonElement("UrlLink")]
+        public string? UrlLink {get; set;}
     }
 }
