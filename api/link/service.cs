@@ -5,14 +5,14 @@ namespace RepositoryPattern.Services.LinkUrlService
 {
     public class LinkUrlService : ILinkUrlService
     {
-        private readonly IMongoCollection<Link> dataUser;
+        private readonly IMongoCollection<User> dataUser;
         private readonly string key;
 
         public LinkUrlService(IConfiguration configuration)
         {
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
             IMongoDatabase database = client.GetDatabase("Twillink");
-            dataUser = database.GetCollection<Link>("Link");
+            dataUser = database.GetCollection<User>("Users");
             this.key = configuration.GetSection("AppSettings")["JwtKey"];
         }
 
@@ -20,7 +20,7 @@ namespace RepositoryPattern.Services.LinkUrlService
         {
             try
             {
-                var items = await dataUser.Find(_ => _.UserName == UserName).FirstOrDefaultAsync();
+                var items = await dataUser.Find(_ => _.Username == UserName).FirstOrDefaultAsync();
                 return new { code = 200, data = items, message = "Available" };
             }
             catch (CustomException)
