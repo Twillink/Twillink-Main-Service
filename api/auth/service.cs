@@ -91,7 +91,7 @@ namespace RepositoryPattern.Services.AuthService
                     Email = data.Email,
                     Password = hashedPassword,
                     IsActive = true,
-                    IsVerification = false,
+                    IsVerification = true,
                     IdRole = Roles.User,
                     CreatedAt = DateTime.Now
                 };
@@ -99,15 +99,19 @@ namespace RepositoryPattern.Services.AuthService
                 await dataUser.InsertOneAsync(roleData);
                 string roleIdAsString = roleData.Id.ToString();
 
-                var email = new EmailForm()
-                {
-                    Id = uuid,
-                    Email = data.Email,
-                    Subject = "Activation Twillink",
-                    Message = "Activation"
-                };
-                var sending = _emailService.SendEmailAsync(email);
-                return new { code = 200, id = roleIdAsString, message = "Pendaftaran berhasil kami telah mengirimkan email verifikasi" };
+                // var email = new EmailForm()
+                // {
+                //     Id = uuid,
+                //     Email = data.Email,
+                //     Subject = "Activation Twillink",
+                //     Message = "Activation"
+                // };
+                var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
+                var jwtService = new JwtService(configuration);
+                string userId = roleData.Id;
+                string token = jwtService.GenerateJwtToken(userId);
+                // var sending = _emailService.SendEmailAsync(email);
+                return new { code = 200, id = roleIdAsString, accessToken = token };
             }
             catch (CustomException ex)
             {
