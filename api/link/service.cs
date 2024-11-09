@@ -25,7 +25,7 @@ namespace RepositoryPattern.Services.LinkUrlService
                 {
                     return new { code = 200, message = "Available" };
                 }else{
-                    return new { code = 200, message = "Not Available" };
+                    throw new CustomException(400, "Message", "Not Available");
                 }
             }
             catch (CustomException)
