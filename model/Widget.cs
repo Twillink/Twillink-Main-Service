@@ -156,7 +156,13 @@ namespace Twillink.Shared.Models
         [BsonId]
         public string? Id {get; set;}
 
-        [BsonElement("UrlLink")]
-        public string? UrlLink {get; set;}
+        [BsonElement("fileName")]
+        public string? fileName {get; set;}
+
+        [BsonElement("type")]
+        public string? type {get; set;}
+
+        [BsonElement("path")]
+        public string? path {get; set;}
     }
 }

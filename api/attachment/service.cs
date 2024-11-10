@@ -16,34 +16,33 @@ namespace RepositoryPattern.Services.AttachmentService
         public AttachmentService(IConfiguration configuration)
         {
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            IMongoDatabase database = client.GetDatabase("twillink");
+            IMongoDatabase database = client.GetDatabase("Twillink");
             AttachmentLink = database.GetCollection<Attachments>("Attachment");
+            ///
             var credentialPath = configuration["GoogleCloud:CredentialsPath"];
             var googleCredential = Google.Apis.Auth.OAuth2.GoogleCredential.FromFile(credentialPath);
             storageClient = StorageClient.Create(googleCredential);
+
             this.key = configuration.GetSection("AppSettings")["JwtKey"];
         }
         public async Task<Object> Get(string Username)
         {
             try
             {
-                // var items = await AttachmentLink.Find(_ => _.Username.ToLower() == Username.ToLower()).FirstOrDefaultAsync();
-                var Attachment = new Attachments
-                {
-                };
-                return new { code = 200, data = Attachment, message = "Data Add Complete" };
+                var items = await AttachmentLink.Find(_ => _.UserId == Username).ToListAsync();
+                return new { code = 200, data = items, message = "Complete" };
             }
-            catch (CustomException)
+            catch (CustomException ex)
             {
-                throw;
+
+                throw new CustomException(400, "Error", ex.Message); ;
             }
         }
 
-        public async Task<(string FileName, string Url)> Upload(IFormFile file, string fileName)
+        public async Task<(string FileName, string Url)> Upload(IFormFile file, string fileName, string idUser)
         {
             var bucket = bucketName;
             var folderName = "uploads";
-
 
             // Baca file sebagai stream
             using var memoryStream = new MemoryStream();
@@ -58,8 +57,49 @@ namespace RepositoryPattern.Services.AttachmentService
 
             // URL akses file
             var url = $"https://storage.googleapis.com/{bucket}/{fileName}";
+            var uuid = Guid.NewGuid().ToString();
+
+            var otp = new Attachments
+            {
+                Id = uuid,
+                fileName = fileName,
+                type = file.ContentType,
+                path = url,
+                UserId = idUser,
+                CreatedAt = DateTime.Now,
+            };
+
+            // Simpan OTP ke database
+            await AttachmentLink.InsertOneAsync(otp);
 
             return (gcsFile.Name, url);
+        }
+
+        public async Task<object> DeleteFileAsync(string fileUrl)
+        {
+            try
+            {
+                // Extract bucket name and file path from the URL
+                var uri = new Uri(fileUrl);
+                var bucketName = uri.Host.Split('.')[0]; // e.g., "my-bucket" from "https://storage.googleapis.com/my-bucket/filename"
+                var filePath = uri.AbsolutePath.TrimStart('/'); // e.g., "folder/filename.jpg"
+                string fileName = filePath.Split('/').Last();
+
+                // Delete the file from GCS
+                await storageClient.DeleteObjectAsync("twillink", fileName);
+
+                var ChatData = await AttachmentLink.Find(x => x.path == fileUrl).FirstOrDefaultAsync();
+                if (ChatData == null)
+                {
+                    throw new CustomException(400, "Error", "Data Not Found");
+                }
+                await AttachmentLink.DeleteOneAsync(x => x.Id == ChatData.Id);
+                return "Berhasil";
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException(400, "Error", ex.Message);
+            }
         }
     }
 }

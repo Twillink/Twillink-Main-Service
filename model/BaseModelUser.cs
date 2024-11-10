@@ -13,9 +13,9 @@ namespace Twillink.Shared.Models
         [BsonElement("IsVerification")]
         public bool? IsVerification {get; set;}
         [BsonElement("UserId")]
-        public bool? UserId {get; set;}
+        public string? UserId {get; set;}
         [BsonElement("TwillinkId")]
-        public bool? TwillinkId {get; set;}
+        public string? TwillinkId {get; set;}
 
     }
 }
