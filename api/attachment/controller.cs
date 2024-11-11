@@ -24,12 +24,12 @@ namespace Twillink.Server.Controllers
         }
 
         [HttpDelete]
-        [Route("")]
-        public async Task<object> GetAll([FromBody] string url)
+        [Route("{UrlLink}")]
+        public async Task<object> GetAll([FromRoute] string UrlLink)
         {
             try
             {
-                var data = await _IAttachmentService.DeleteFileAsync(url);
+                var data = await _IAttachmentService.DeleteFileAsync(UrlLink);
                 return Ok(data);
             }
             catch (CustomException ex)

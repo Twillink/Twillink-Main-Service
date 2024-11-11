@@ -8,14 +8,13 @@ namespace Twillink.Shared.Models
         public DateTime CreatedAt { get; set; }
         [BsonElement("UpdatedAt")]
         public DateTime? UpdatedAt { get; set; }
-        [BsonElement("IsActive")]
-        public bool? IsActive { get; set; }
-        [BsonElement("IsVerification")]
-        public bool? IsVerification {get; set;}
         [BsonElement("UserId")]
         public string? UserId {get; set;}
-        [BsonElement("TwillinkId")]
-        public string? TwillinkId {get; set;}
-
+        [BsonElement("sequence")]
+        public long? sequence {get; set;}
+        [BsonElement("typeWidget")]
+        public string? typeWidget {get; set;}
+        [BsonElement("width")]
+        public string? width {get; set;}
     }
 }

@@ -4,31 +4,56 @@ namespace Twillink.Shared.Models
 {
     public class Widget
     {
-        public object[] WidgetList {get; set;}
+        public List<AddLink>? Content {get; set;}
         public object user {get; set;}
+    }
+
+    public class Content
+    {
+        [BsonElement("Text")]
+        public string? Text {get; set;}
+
+        [BsonElement("Title")]
+        public string? Title {get; set;}
+
+        [BsonElement("Caption")]
+        public string? Caption {get; set;}
+        
+        [BsonElement("Url")]
+        public string? Url {get; set;}
+
+        [BsonElement("Contents")]
+        public string? Contents {get; set;}
+
+        [BsonElement("Latitude")]
+        public float? Latitude {get; set;}
+
+        [BsonElement("Longitude")]
+        public float? Longitude {get; set;}
+
+        [BsonElement("Email")]
+        public string? Email {get; set;}
+
+        [BsonElement("PhoneNumber")]
+        public string? PhoneNumber {get; set;}
+        [BsonElement("AttachmentUrl")]
+        public List<string>? AttachmentUrl {get; set;}
+
     }
     public class AddLink : BaseModelUser 
     {
         [BsonId]
         public string? Id {get; set;}
-
-        [BsonElement("Title")]
-        public string? Title {get; set;}
-        
-        [BsonElement("UrlLink")]
-        public string? UrlLink {get; set;}
-
-        [BsonElement("UrlTumbnail")]
-        public string? UrlTumbnail {get; set;}
+        [BsonElement("Content")]
+        public Content? Content {get; set;}
     }
 
     public class AddText : BaseModelUser
     {
         [BsonId]
         public string? Id {get; set;}
-
-        [BsonElement("Text")]
-        public string? Text {get; set;}
+        [BsonElement("Content")]
+        public Content? Content {get; set;}
     }
 
     public class AddImage : BaseModelUser
@@ -71,15 +96,7 @@ namespace Twillink.Shared.Models
     {
         [BsonId]
         public string? Id {get; set;}
-
-        [BsonElement("UrlCover")]
-        public string? UrlCover {get; set;}
-        
-        [BsonElement("Title")]
-        public string? Title {get; set;}
-
-        [BsonElement("Content")]
-        public string? Content {get; set;}
+        public Content? Content {get; set;}
     }
 
     public class AddContact : BaseModelUser
