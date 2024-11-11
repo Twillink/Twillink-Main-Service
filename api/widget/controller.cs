@@ -7,7 +7,7 @@ namespace Twillink.Server.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/v1/widget")]
+    [Route("api/v1")]
     public class WidgetController : ControllerBase
     {
         private readonly IWidgetService _IWidgetService;
@@ -24,7 +24,7 @@ namespace Twillink.Server.Controllers
 
         // [Authorize]
         [HttpGet]
-        [Route("{Username}")]
+        [Route("widget/{Username}")]
         public async Task<object> Get([FromRoute] string Username)
         {
             try
@@ -42,7 +42,7 @@ namespace Twillink.Server.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("user")]
+        [Route("widget")]
         public async Task<object> GetUser()
         {
             try
