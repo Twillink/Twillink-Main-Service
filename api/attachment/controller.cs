@@ -78,7 +78,7 @@ namespace Twillink.Server.Controllers
                 }
 
                 // Define allowed MIME types for images and videos
-                var allowedImageTypes = new[] { "image/jpeg", "image/png", "image/gif" };
+                var allowedImageTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/jpeg" };
                 var allowedVideoTypes = new[] { "video/mp4", "video/mpeg", "video/quicktime" };
 
                 // Define max file size: 2 MB for images, 50 MB for videos
