@@ -61,15 +61,17 @@ namespace RepositoryPattern.Services.WidgetService
                 var widget = new
                 {
                     WidgetList,
-                    ProfileUser = new
+                    Profile = new
                     {
-                        Email = items.Email,
-                        FullName = items.FullName,
-                        PhoneNumber = items.PhoneNumber,
-                        Username = items.Username
+                        Username = items.Username,
+                        Email = WidgetContact?.Content?.Email,
+                        PhoneNumber = WidgetContact?.Content?.PhoneNumber,
+                        FullName = WidgetProfile?.Content?.FullName,
+                        Description = WidgetProfile?.Content?.Description,
+                        UrlBanner = WidgetProfile?.Content?.UrlBanner,
+                        UrlImage = WidgetProfile?.Content?.UrlImageProfile,
                     },
-                    Contact = WidgetContact?.Content,
-                    ProfileTwill = WidgetProfile?.Content,
+
                 };
                 return new { code = 200, data = widget, message = "Data Add Complete" };
             }
