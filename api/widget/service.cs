@@ -74,7 +74,14 @@ namespace RepositoryPattern.Services.WidgetService
                 var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact").Select(x => new
                 {
                     x.Id,
-                    WidgetContent = x.Content, // Renamed from 'content' to 'CustomContent'
+                    WidgetText = x.typeWidget == "text" ? x.Content : null, // Only set if typeWidget is "text"
+                    WidgetVideo = x.typeWidget == "video" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetLink = x.typeWidget == "link" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetCarousel = x.typeWidget == "carousel" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetBlog = x.typeWidget == "blog" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetMap = x.typeWidget == "map" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetContact = x.typeWidget == "contact" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetImage = x.typeWidget == "image" ? x.Content : null, // Only set if typeWidget is "video"
                     x.CreatedAt,
                     x.UpdatedAt,
                     x.UserId,
