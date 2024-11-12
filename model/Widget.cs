@@ -73,6 +73,18 @@ namespace Twillink.Shared.Models
         public Content? Content {get; set;}
     }
 
+    public class AddSosmed 
+    {
+        [BsonId]
+        public string? Key {get; set;}
+
+        [BsonElement("Value")]
+        public string? Value {get; set;}
+
+        [BsonElement("UserId")]
+        public string? UserId {get; set;}
+    }
+
     public class AddText : BaseModelUser
     {
         [BsonId]

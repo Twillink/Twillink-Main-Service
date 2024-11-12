@@ -91,6 +91,13 @@ public class CreateProfiles
     public string? UrlImageProfile { get; set; }
 }
 
+public class CreateSosmed
+{
+
+    public string? Key { get; set; }
+    public string? Value { get; set; }
+}
+
 public class CreateCarausel
 {
 

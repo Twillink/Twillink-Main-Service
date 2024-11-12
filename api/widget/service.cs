@@ -8,8 +8,7 @@ namespace RepositoryPattern.Services.WidgetService
         private readonly IMongoCollection<Widget> widgetLink;
         private readonly IMongoCollection<AddText> addText;
         private readonly IMongoCollection<AddLink> addLink;
-
-
+        private readonly IMongoCollection<AddSosmed> addSosmed;
         private readonly IMongoCollection<User> users;
 
         private readonly string key;
@@ -21,7 +20,7 @@ namespace RepositoryPattern.Services.WidgetService
             widgetLink = database.GetCollection<Widget>("Widget");
             addText = database.GetCollection<AddText>("Widget");
             addLink = database.GetCollection<AddLink>("Widget");
-
+            addSosmed = database.GetCollection<AddSosmed>("Sosmed");
             users = database.GetCollection<User>("Users");
 
             this.key = configuration.GetSection("AppSettings")["JwtKey"];
@@ -57,6 +56,7 @@ namespace RepositoryPattern.Services.WidgetService
                 }).ToList();
                 var WidgetContact = filteredWidget.Find(x => x.typeWidget == "contact");
                 var WidgetProfile = filteredWidget.Find(x => x.typeWidget == "profile");
+                var WidgetSosmed = await addSosmed.Find(_ => _.UserId.ToLower() == items.Id.ToLower()).ToListAsync();
 
                 var widget = new
                 {
@@ -71,6 +71,7 @@ namespace RepositoryPattern.Services.WidgetService
                         UrlBanner = WidgetProfile?.Content?.UrlBanner,
                         UrlImage = WidgetProfile?.Content?.UrlImageProfile,
                     },
+                    Sosmed = WidgetSosmed
 
                 };
                 return new { code = 200, data = widget, message = "Data Add Complete" };
@@ -113,6 +114,8 @@ namespace RepositoryPattern.Services.WidgetService
                 var WidgetContact = filteredWidget.Find(x => x.typeWidget == "contact");
                 var WidgetProfile = filteredWidget.Find(x => x.typeWidget == "profile");
 
+                var WidgetSosmed = await addSosmed.Find(_ => _.UserId.ToLower() == items.Id.ToLower()).ToListAsync();
+
                 var widget = new
                 {
                     WidgetList,
@@ -126,6 +129,7 @@ namespace RepositoryPattern.Services.WidgetService
                         UrlBanner = WidgetProfile?.Content?.UrlBanner,
                         UrlImage = WidgetProfile?.Content?.UrlImageProfile,
                     },
+                    Sosmed = WidgetSosmed
 
                 };
                 return new { code = 200, data = widget, message = "Data Add Complete" };
@@ -467,6 +471,52 @@ namespace RepositoryPattern.Services.WidgetService
                 throw new CustomException(400, "Error", ex.Message); ;
             }
         }
+
+        public async Task<object> AddSosmed(string idUser, CreateSosmed createText)
+        {
+            try
+            {
+                // Define the filter using the UserId and Key
+                var filter = Builders<AddSosmed>.Filter.And(
+                    Builders<AddSosmed>.Filter.Eq(x => x.UserId, idUser),
+                    Builders<AddSosmed>.Filter.Eq(x => x.Key, createText.Key)
+                );
+
+                // Check if the item exists
+                var existingItem = await addSosmed.Find(filter).FirstOrDefaultAsync();
+
+                if (existingItem != null)
+                {
+                    // Create the updated document
+                    var updatedItem = new AddSosmed
+                    {
+                        Key = createText.Key,
+                        Value = createText.Value,
+                        UserId = idUser
+                    };
+
+                    // Update the existing item
+                    await addSosmed.ReplaceOneAsync(filter, updatedItem);
+                    return new { code = 200, message = "Berhasil Update" };
+                }
+
+                // If the item does not exist, insert a new document
+                var newItem = new AddSosmed
+                {
+                    Key = createText.Key,
+                    Value = createText.Value,
+                    UserId = idUser
+                };
+
+                await addSosmed.InsertOneAsync(newItem);
+                return new { code = 200, message = "Berhasil" };
+            }
+            catch (CustomException ex)
+            {
+                throw new CustomException(400, "Error", ex.Message);
+            }
+        }
+
 
         public async Task<object> AddCarousel(string idUser, CreateCarausel createText)
         {

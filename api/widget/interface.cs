@@ -14,4 +14,6 @@ public interface IWidgetService
     Task<Object> AddCarousel(string ID, CreateCarausel item);
     Task<Object> ChangeWidth(string ID, ChangeWidthDto item);
     Task<Object> AddProfile(string ID, CreateProfiles item);
+    Task<Object> AddSosmed(string ID, CreateSosmed item);
+
 }

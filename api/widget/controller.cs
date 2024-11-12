@@ -282,6 +282,26 @@ namespace Twillink.Server.Controllers
 
         [Authorize]
         [HttpPost]
+        [Route("widget-sosmed")]
+        public async Task<object> AddSosmed([FromBody] CreateSosmed item )
+        {
+            try
+            {
+                string accessToken = HttpContext.Request.Headers["Authorization"];
+                string idUser = await _ConvertJwt.ConvertString(accessToken);
+                var data = await _IWidgetService.AddSosmed(idUser, item);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
         [Route("widget-carousel")]
         public async Task<object> AddCarousel([FromBody] CreateCarausel item )
         {
