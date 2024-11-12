@@ -441,41 +441,17 @@ namespace RepositoryPattern.Services.WidgetService
                         // Define the filter by Id
                         var filter = Builders<AddLink>.Filter.Eq(_ => _.Id, item.Id);
 
-                        if(!string.IsNullOrEmpty(createText.FullName))
+                        // Define the update for the Content field
+                        var update = Builders<AddLink>.Update.Set(_ => _.Content, new Content
                         {
-                            var updateA = Builders<AddLink>.Update.Set(_ => _.Content, new Content
-                            {
-                                FullName = createText.FullName,
-                            });
-                            await addLink.UpdateOneAsync(filter, updateA);
-                        }
+                            FullName = createText.FullName,
+                            Description = createText.Description,
+                            UrlBanner = createText.UrlBanner,
+                            UrlImageProfile = createText.UrlImageProfile,
+                        });
 
-                        if(!string.IsNullOrEmpty(createText.Description))
-                        {
-                            var updateB = Builders<AddLink>.Update.Set(_ => _.Content, new Content
-                            {
-                                Description = createText.Description,
-                            });
-                            await addLink.UpdateOneAsync(filter, updateB);
-                        }
-
-                        if(!string.IsNullOrEmpty(createText.UrlBanner))
-                        {
-                            var updateC = Builders<AddLink>.Update.Set(_ => _.Content, new Content
-                            {
-                                UrlBanner = createText.UrlBanner,
-                            });
-                            await addLink.UpdateOneAsync(filter, updateC);
-                        }
-
-                        if(!string.IsNullOrEmpty(createText.UrlImageProfile))
-                        {
-                            var updateD = Builders<AddLink>.Update.Set(_ => _.Content, new Content
-                            {
-                                UrlImageProfile = createText.UrlImageProfile,
-                            });
-                            await addLink.UpdateOneAsync(filter, updateD);
-                        }
+                        // Perform the update
+                        await addLink.UpdateOneAsync(filter, update);
                         return new { code = 200, message = "Berhasil" };
                     }
                 }
