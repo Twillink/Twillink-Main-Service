@@ -15,6 +15,8 @@ public class CreateLink
 {
     public string? Title { get; set; }
     public string? Url { get; set; }
+    public string? UrlThumbnail { get; set; }
+
 }
 
 public class UpdatePos
@@ -42,6 +44,7 @@ public class CreateImage
 
     public string? Caption { get; set; }
     public string? Url { get; set; }
+    public string? UrlThumbnail { get; set; }
 }
 
 public class CreateProfile
@@ -58,6 +61,8 @@ public class CreateVideo
     public string? Caption { get; set; }
 
     public string? UrlVideo { get; set; }
+
+    public string? UrlThumbnail { get; set; }
 }
 
 public class CreateContent
@@ -75,6 +80,13 @@ public class CreateContact
 
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
+}
+
+public class CreateProfiles
+{
+
+    public string? UrlBanner { get; set; }
+    public string? UrlImageProfile { get; set; }
 }
 
 public class CreateCarausel

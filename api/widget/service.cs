@@ -37,9 +37,25 @@ namespace RepositoryPattern.Services.WidgetService
                 }
 
                 var filteredWidget = await addText.Find(_ => _.UserId == items.Id).SortBy(_ => _.sequence).ToListAsync();
-                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact").ToList();
+                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact").Select(x => new
+                {
+                    x.Id,
+                    WidgetText = x.typeWidget == "text" ? x.Content : null, // Only set if typeWidget is "text"
+                    WidgetVideo = x.typeWidget == "video" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetLink = x.typeWidget == "link" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetCarousel = x.typeWidget == "carousel" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetBlog = x.typeWidget == "blog" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetMap = x.typeWidget == "map" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetContact = x.typeWidget == "contact" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetImage = x.typeWidget == "image" ? x.Content : null, // Only set if typeWidget is "video"
+                    x.CreatedAt,
+                    x.UpdatedAt,
+                    x.UserId,
+                    x.sequence,
+                    x.typeWidget,
+                    x.width
+                }).ToList();
                 var WidgetContact = filteredWidget.Find(x => x.typeWidget == "contact");
-
                 var widget = new
                 {
                     WidgetList,
@@ -162,6 +178,7 @@ namespace RepositoryPattern.Services.WidgetService
                     {
                         Title = createText.Title,
                         Url = createText.Url,
+                        urlThumbnail = createText.UrlThumbnail
                     }
                 };
 
@@ -228,6 +245,7 @@ namespace RepositoryPattern.Services.WidgetService
                     {
                         Caption = createText.Caption,
                         Url = createText.Url,
+                        urlThumbnail = createText.UrlThumbnail
                     }
                 };
 
@@ -331,6 +349,59 @@ namespace RepositoryPattern.Services.WidgetService
         }
 
         public async Task<object> AddContact(string idUser, CreateContact createText)
+        {
+            try
+            {
+                var items = await addLink.Find(_ => _.UserId == idUser).ToListAsync();
+                long count = items.Count();
+
+                foreach (var item in items)
+                {
+                    if (item.typeWidget == "contact")
+                    {
+                        // Define the filter by Id
+                        var filter = Builders<AddLink>.Filter.Eq(_ => _.Id, item.Id);
+
+                        // Define the update for the Content field
+                        var update = Builders<AddLink>.Update.Set(_ => _.Content, new Content
+                        {
+                            Email = createText.Email,
+                            PhoneNumber = createText.PhoneNumber
+                        });
+
+                        // Perform the update
+                        await addLink.UpdateOneAsync(filter, update);
+                        return new { code = 200, message = "Berhasil" };
+                    }
+                }
+
+                var uuid = Guid.NewGuid().ToString();
+                var itemNew = new AddLink()
+                {
+                    Id = uuid,
+                    UserId = idUser,
+                    sequence = null,
+                    typeWidget = "contact",
+                    width = "100%",
+                    CreatedAt = DateTime.Now,
+                    Content = new Content
+                    {
+                        Email = createText.Email,
+                        PhoneNumber = createText.PhoneNumber,
+                    }
+                };
+
+                await addLink.InsertOneAsync(itemNew);
+                return new { code = 200, message = "Berhasil" };
+            }
+            catch (CustomException ex)
+            {
+
+                throw new CustomException(400, "Error", ex.Message); ;
+            }
+        }
+
+        public async Task<object> AddBanner(string idUser, CreateContact createText)
         {
             try
             {

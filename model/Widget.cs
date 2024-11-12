@@ -34,6 +34,9 @@ namespace Twillink.Shared.Models
         [BsonElement("Email")]
         public string? Email {get; set;}
 
+        [BsonElement("urlThumbnail")]
+        public string? urlThumbnail {get; set;}
+
         [BsonElement("PhoneNumber")]
         public string? PhoneNumber {get; set;}
         [BsonElement("widgetCarouselAttachment")]
