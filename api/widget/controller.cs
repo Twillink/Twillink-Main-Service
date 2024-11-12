@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Twillink.Server.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/v1")]
     public class WidgetController : ControllerBase
