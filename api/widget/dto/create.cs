@@ -82,7 +82,7 @@ public class CreateCarausel
 
     public string? Caption { get; set; }
 
-    public List<string>? AttachmentUrl {get; set;}
+    public List<string>? attachmentIds {get; set;}
 }
 
 public class CreateWebinar

@@ -36,8 +36,8 @@ namespace Twillink.Shared.Models
 
         [BsonElement("PhoneNumber")]
         public string? PhoneNumber {get; set;}
-        [BsonElement("AttachmentUrl")]
-        public List<string>? AttachmentUrl {get; set;}
+        [BsonElement("attachmentIds")]
+        public List<string>? attachmentIds {get; set;}
 
     }
     public class AddLink : BaseModelUser 

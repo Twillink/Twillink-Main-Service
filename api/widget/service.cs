@@ -401,7 +401,7 @@ namespace RepositoryPattern.Services.WidgetService
                         var update = Builders<AddLink>.Update.Set(_ => _.Content, new Content
                         {
                             Caption = createText.Caption,
-                            AttachmentUrl = createText.AttachmentUrl
+                            attachmentIds = createText.attachmentIds
                         });
 
                         // Perform the update
@@ -422,7 +422,7 @@ namespace RepositoryPattern.Services.WidgetService
                     Content = new Content
                     {
                         Caption = createText.Caption,
-                        AttachmentUrl = createText.AttachmentUrl
+                        attachmentIds = createText.attachmentIds
                     }
                 };
 
