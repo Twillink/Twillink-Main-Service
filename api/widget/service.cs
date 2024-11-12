@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using MongoDB.Driver;
 using Twillink.Shared.Models;
 
@@ -57,6 +58,12 @@ namespace RepositoryPattern.Services.WidgetService
                 var WidgetContact = filteredWidget.Find(x => x.typeWidget == "contact");
                 var WidgetProfile = filteredWidget.Find(x => x.typeWidget == "profile");
                 var WidgetSosmed = await addSosmed.Find(_ => _.UserId.ToLower() == items.Id.ToLower()).ToListAsync();
+                string pattern = @"[^/]+$";
+                var filteredSosmed = WidgetSosmed.Select(x => new
+                {
+                    Key = Regex.Match(x.Key, pattern).Value,
+                    Value = x.Value
+                }).ToList();
 
                 var widget = new
                 {
@@ -71,7 +78,7 @@ namespace RepositoryPattern.Services.WidgetService
                         UrlBanner = WidgetProfile?.Content?.UrlBanner,
                         UrlImage = WidgetProfile?.Content?.UrlImageProfile,
                     },
-                    Sosmed = WidgetSosmed
+                    Sosmed = filteredSosmed
 
                 };
                 return new { code = 200, data = widget, message = "Data Add Complete" };
@@ -113,8 +120,13 @@ namespace RepositoryPattern.Services.WidgetService
                 }).ToList();
                 var WidgetContact = filteredWidget.Find(x => x.typeWidget == "contact");
                 var WidgetProfile = filteredWidget.Find(x => x.typeWidget == "profile");
-
                 var WidgetSosmed = await addSosmed.Find(_ => _.UserId.ToLower() == items.Id.ToLower()).ToListAsync();
+                string pattern = @"[^/]+$";
+                var filteredSosmed = WidgetSosmed.Select(x => new
+                {
+                    Key = Regex.Match(x.Key, pattern).Value,
+                    Value = x.Value
+                }).ToList();
 
                 var widget = new
                 {
@@ -129,7 +141,7 @@ namespace RepositoryPattern.Services.WidgetService
                         UrlBanner = WidgetProfile?.Content?.UrlBanner,
                         UrlImage = WidgetProfile?.Content?.UrlImageProfile,
                     },
-                    Sosmed = WidgetSosmed
+                    Sosmed = filteredSosmed
 
                 };
                 return new { code = 200, data = widget, message = "Data Add Complete" };
@@ -479,7 +491,7 @@ namespace RepositoryPattern.Services.WidgetService
                 // Define the filter using the UserId and Key
                 var filter = Builders<AddSosmed>.Filter.And(
                     Builders<AddSosmed>.Filter.Eq(x => x.UserId, idUser),
-                    Builders<AddSosmed>.Filter.Eq(x => x.Key, createText.Key)
+                    Builders<AddSosmed>.Filter.Eq(x => x.Key, idUser+"/"+createText.Key)
                 );
 
                 // Check if the item exists
@@ -490,7 +502,7 @@ namespace RepositoryPattern.Services.WidgetService
                     // Create the updated document
                     var updatedItem = new AddSosmed
                     {
-                        Key = createText.Key,
+                        Key = idUser+"/"+createText.Key,
                         Value = createText.Value,
                         UserId = idUser
                     };
@@ -503,7 +515,7 @@ namespace RepositoryPattern.Services.WidgetService
                 // If the item does not exist, insert a new document
                 var newItem = new AddSosmed
                 {
-                    Key = createText.Key,
+                    Key = idUser+"/"+createText.Key,
                     Value = createText.Value,
                     UserId = idUser
                 };
@@ -610,6 +622,20 @@ namespace RepositoryPattern.Services.WidgetService
             try
             {
                 await addLink.DeleteOneAsync(o => o.Id == id);
+                return new { code = 200, message = "Berhasil" };
+            }
+            catch (CustomException ex)
+            {
+
+                throw new CustomException(400, "Error", ex.Message); ;
+            }
+        }
+
+        public async Task<object> DeleteSosmed(string idUser, string Key)
+        {
+            try
+            {
+                await addSosmed.DeleteOneAsync(o => o.Key == idUser+"/"+Key);    
                 return new { code = 200, message = "Berhasil" };
             }
             catch (CustomException ex)

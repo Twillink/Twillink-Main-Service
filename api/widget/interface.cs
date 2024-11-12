@@ -15,5 +15,6 @@ public interface IWidgetService
     Task<Object> ChangeWidth(string ID, ChangeWidthDto item);
     Task<Object> AddProfile(string ID, CreateProfiles item);
     Task<Object> AddSosmed(string ID, CreateSosmed item);
+    Task<Object> DeleteSosmed(string idUser, string ID);
 
 }

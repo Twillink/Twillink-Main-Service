@@ -301,6 +301,26 @@ namespace Twillink.Server.Controllers
         }
 
         [Authorize]
+        [HttpDelete]
+        [Route("widget-sosmed/{key}")]
+        public async Task<object> DeleteSosmed([FromRoute] string key )
+        {
+            try
+            {
+                string accessToken = HttpContext.Request.Headers["Authorization"];
+                string idUser = await _ConvertJwt.ConvertString(accessToken);
+                var data = await _IWidgetService.DeleteSosmed(idUser, key);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [Authorize]
         [HttpPost]
         [Route("widget-carousel")]
         public async Task<object> AddCarousel([FromBody] CreateCarausel item )
