@@ -37,6 +37,18 @@ namespace Twillink.Shared.Models
         [BsonElement("urlThumbnail")]
         public string? urlThumbnail {get; set;}
 
+        [BsonElement("FullName")]
+        public string? FullName {get; set;}
+
+        [BsonElement("Description")]
+        public string? Description {get; set;}
+
+        [BsonElement("UrlBanner")]
+        public string? UrlBanner {get; set;}
+
+        [BsonElement("UrlImageProfile")]
+        public string? UrlImageProfile {get; set;}
+
         [BsonElement("PhoneNumber")]
         public string? PhoneNumber {get; set;}
         [BsonElement("widgetCarouselAttachment")]

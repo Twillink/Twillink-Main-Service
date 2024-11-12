@@ -85,6 +85,8 @@ public class CreateContact
 public class CreateProfiles
 {
 
+    public string? FullName { get; set; }
+    public string? Description { get; set; }
     public string? UrlBanner { get; set; }
     public string? UrlImageProfile { get; set; }
 }

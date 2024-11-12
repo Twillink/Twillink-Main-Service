@@ -37,7 +37,7 @@ namespace RepositoryPattern.Services.WidgetService
                 }
 
                 var filteredWidget = await addText.Find(_ => _.UserId == items.Id).SortBy(_ => _.sequence).ToListAsync();
-                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact").Select(x => new
+                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact" || x.typeWidget != "profile").Select(x => new
                 {
                     x.Id,
                     WidgetText = x.typeWidget == "text" ? x.Content : null, // Only set if typeWidget is "text"
@@ -56,17 +56,20 @@ namespace RepositoryPattern.Services.WidgetService
                     x.width
                 }).ToList();
                 var WidgetContact = filteredWidget.Find(x => x.typeWidget == "contact");
+                var WidgetProfile = filteredWidget.Find(x => x.typeWidget == "profile");
+
                 var widget = new
                 {
                     WidgetList,
-                    Profile = new
+                    ProfileUser = new
                     {
                         Email = items.Email,
                         FullName = items.FullName,
                         PhoneNumber = items.PhoneNumber,
                         Username = items.Username
                     },
-                    Contact = WidgetContact
+                    Contact = WidgetContact?.Content,
+                    ProfileTwill = WidgetProfile?.Content,
                 };
                 return new { code = 200, data = widget, message = "Data Add Complete" };
             }
@@ -87,7 +90,7 @@ namespace RepositoryPattern.Services.WidgetService
                 }
 
                 var filteredWidget = await addText.Find(_ => _.UserId == items.Id).SortBy(_ => _.sequence).ToListAsync();
-                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact").Select(x => new
+                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact" || x.typeWidget != "profile").Select(x => new
                 {
                     x.Id,
                     WidgetText = x.typeWidget == "text" ? x.Content : null, // Only set if typeWidget is "text"
@@ -106,17 +109,22 @@ namespace RepositoryPattern.Services.WidgetService
                     x.width
                 }).ToList();
                 var WidgetContact = filteredWidget.Find(x => x.typeWidget == "contact");
+                var WidgetProfile = filteredWidget.Find(x => x.typeWidget == "profile");
+
                 var widget = new
                 {
                     WidgetList,
                     Profile = new
                     {
-                        Email = items.Email,
-                        FullName = items.FullName,
-                        PhoneNumber = items.PhoneNumber,
-                        Username = items.Username
+                        Username = items.Username,
+                        Email = WidgetContact?.Content?.Email,
+                        PhoneNumber = WidgetContact?.Content?.PhoneNumber,
+                        FullName = WidgetProfile?.Content?.FullName,
+                        Description = WidgetProfile?.Content?.Description,
+                        UrlBanner = WidgetProfile?.Content?.UrlBanner,
+                        UrlImage = WidgetProfile?.Content?.UrlImageProfile,
                     },
-                    Contact = WidgetContact
+
                 };
                 return new { code = 200, data = widget, message = "Data Add Complete" };
             }
@@ -401,7 +409,7 @@ namespace RepositoryPattern.Services.WidgetService
             }
         }
 
-        public async Task<object> AddBanner(string idUser, CreateContact createText)
+        public async Task<object> AddProfile(string idUser, CreateProfiles createText)
         {
             try
             {
@@ -410,7 +418,7 @@ namespace RepositoryPattern.Services.WidgetService
 
                 foreach (var item in items)
                 {
-                    if (item.typeWidget == "contact")
+                    if (item.typeWidget == "profile")
                     {
                         // Define the filter by Id
                         var filter = Builders<AddLink>.Filter.Eq(_ => _.Id, item.Id);
@@ -418,8 +426,10 @@ namespace RepositoryPattern.Services.WidgetService
                         // Define the update for the Content field
                         var update = Builders<AddLink>.Update.Set(_ => _.Content, new Content
                         {
-                            Email = createText.Email,
-                            PhoneNumber = createText.PhoneNumber
+                            FullName = createText.FullName,
+                            Description = createText.Description,
+                            UrlBanner = createText.UrlBanner,
+                            UrlImageProfile = createText.UrlImageProfile,
                         });
 
                         // Perform the update
@@ -434,13 +444,15 @@ namespace RepositoryPattern.Services.WidgetService
                     Id = uuid,
                     UserId = idUser,
                     sequence = null,
-                    typeWidget = "contact",
+                    typeWidget = "profile",
                     width = "100%",
                     CreatedAt = DateTime.Now,
                     Content = new Content
                     {
-                        Email = createText.Email,
-                        PhoneNumber = createText.PhoneNumber,
+                        FullName = createText.FullName,
+                        Description = createText.Description,
+                        UrlBanner = createText.UrlBanner,
+                        UrlImageProfile = createText.UrlImageProfile,
                     }
                 };
 
