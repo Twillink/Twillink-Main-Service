@@ -36,17 +36,21 @@ namespace RepositoryPattern.Services.WidgetService
                     throw new CustomException(404, "Message", "Account Not Found");
                 }
 
-                var WidgetList = await addText.Find(_ => _.UserId == items.Id).SortBy(_ => _.sequence).ToListAsync();
+                var filteredWidget = await addText.Find(_ => _.UserId == items.Id).SortBy(_ => _.sequence).ToListAsync();
+                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact").ToList();
+                var WidgetContact = filteredWidget.Find(x => x.typeWidget == "contact");
+
                 var widget = new
                 {
                     WidgetList,
-                    user = new
+                    Profile = new
                     {
                         Email = items.Email,
                         FullName = items.FullName,
                         PhoneNumber = items.PhoneNumber,
                         Username = items.Username
-                    }
+                    },
+                    Contact = WidgetContact
                 };
                 return new { code = 200, data = widget, message = "Data Add Complete" };
             }
@@ -66,17 +70,30 @@ namespace RepositoryPattern.Services.WidgetService
                     throw new CustomException(404, "Message", "Account Not Found");
                 }
 
-                var WidgetList = await addText.Find(_ => _.UserId == Id).SortBy(_ => _.sequence).ToListAsync();
+                var filteredWidget = await addText.Find(_ => _.UserId == items.Id).SortBy(_ => _.sequence).ToListAsync();
+                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact").Select(x => new
+                {
+                    x.Id,
+                    WidgetContent = x.Content, // Renamed from 'content' to 'CustomContent'
+                    x.CreatedAt,
+                    x.UpdatedAt,
+                    x.UserId,
+                    x.sequence,
+                    x.typeWidget,
+                    x.width
+                }).ToList();
+                var WidgetContact = filteredWidget.Find(x => x.typeWidget == "contact");
                 var widget = new
                 {
                     WidgetList,
-                    user = new
+                    Profile = new
                     {
                         Email = items.Email,
                         FullName = items.FullName,
                         PhoneNumber = items.PhoneNumber,
                         Username = items.Username
-                    }
+                    },
+                    Contact = WidgetContact
                 };
                 return new { code = 200, data = widget, message = "Data Add Complete" };
             }
@@ -403,6 +420,60 @@ namespace RepositoryPattern.Services.WidgetService
                 };
 
                 await addLink.InsertOneAsync(itemNew);
+                return new { code = 200, message = "Berhasil" };
+            }
+            catch (CustomException ex)
+            {
+
+                throw new CustomException(400, "Error", ex.Message); ;
+            }
+        }
+
+
+        public async Task<object> ChangeWidth(string idUser, ChangeWidthDto createText)
+        {
+            try
+            {
+                var roleData = await addText.Find(x => x.Id.Equals(idUser, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefaultAsync();
+                if (roleData == null)
+                    throw new CustomException(400, "Message", "ID not found");
+
+                roleData.width = createText.width;
+                await addText.ReplaceOneAsync(x => x.Id == roleData.Id, roleData);
+                return new { code = 200, message = "Berhasil" };
+            }
+            catch (CustomException ex)
+            {
+
+                throw new CustomException(400, "Error", ex.Message); ;
+            }
+        }
+
+        public async Task<object> DeleteItem(string id)
+        {
+            try
+            {
+                await addLink.DeleteOneAsync(o => o.Id == id);
+                return new { code = 200, message = "Berhasil" };
+            }
+            catch (CustomException ex)
+            {
+
+                throw new CustomException(400, "Error", ex.Message); ;
+            }
+        }
+
+        public async Task<object> PostNewPos(List<UpdatePos> createText)
+        {
+            try
+            {
+                foreach (var updateDto in createText)
+                {
+                    var filter = Builders<AddLink>.Filter.Eq(item => item.Id, updateDto.Id);
+                    var update = Builders<AddLink>.Update.Set(item => item.sequence, updateDto.sequence);
+
+                    var result = await addLink.UpdateOneAsync(filter, update);
+                }
                 return new { code = 200, message = "Berhasil" };
             }
             catch (CustomException ex)

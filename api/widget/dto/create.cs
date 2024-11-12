@@ -4,10 +4,24 @@ public class CreateWidgetDto
 
 }
 
+public class ChangeWidthDto
+{
+    public string? id { get; set; }
+    public string? width { get; set; }
+
+}
+
 public class CreateLink
 {
     public string? Title { get; set; }
     public string? Url { get; set; }
+}
+
+public class UpdatePos
+{
+    public string? Id { get; set; }
+    public long? sequence { get; set; }
+
 }
 
 public class CreateText

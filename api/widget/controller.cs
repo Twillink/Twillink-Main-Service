@@ -61,6 +61,66 @@ namespace Twillink.Server.Controllers
         }
 
         [Authorize]
+        [HttpPut]
+        [Route("widget/change-width/{id}")]
+        public async Task<object> GetUser([FromRoute]string id, [FromBody] ChangeWidthDto item)
+        {
+            try
+            {
+                string accessToken = HttpContext.Request.Headers["Authorization"];
+                string idUser = await _ConvertJwt.ConvertString(accessToken);
+                var data = await _IWidgetService.ChangeWidth(id, item);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("widget/{id}")]
+        public async Task<object> DeleteItem([FromRoute]string id)
+        {
+            try
+            {
+                string accessToken = HttpContext.Request.Headers["Authorization"];
+                string idUser = await _ConvertJwt.ConvertString(accessToken);
+                var data = await _IWidgetService.DeleteItem(id);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("widget/order")]
+        public async Task<object> PostNewPos([FromBody] List<UpdatePos> item )
+        {
+            try
+            {
+                string accessToken = HttpContext.Request.Headers["Authorization"];
+                string idUser = await _ConvertJwt.ConvertString(accessToken);
+                var data = await _IWidgetService.PostNewPos(item);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [Authorize]
         [HttpPost]
         [Route("widget-text")]
         public async Task<object> AddText([FromBody] CreateText item )
