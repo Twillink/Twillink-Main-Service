@@ -36,9 +36,19 @@ namespace Twillink.Shared.Models
 
         [BsonElement("PhoneNumber")]
         public string? PhoneNumber {get; set;}
-        [BsonElement("attachmentIds")]
-        public List<string>? attachmentIds {get; set;}
+        [BsonElement("widgetCarouselAttachment")]
+        public List<CarouselItem>? WidgetCarouselAttachment {get; set;}
 
+    }
+
+    public class CarouselItem
+    {
+        [BsonElement("id")]
+        public string? id {get; set;}
+        [BsonElement("widgetCarouselId")]
+        public string? widgetCarouselId {get; set;}
+        [BsonElement("attachmentId")]
+        public string? attachmentId {get; set;}
     }
     public class AddLink : BaseModelUser 
     {

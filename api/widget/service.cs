@@ -401,7 +401,14 @@ namespace RepositoryPattern.Services.WidgetService
                         var update = Builders<AddLink>.Update.Set(_ => _.Content, new Content
                         {
                             Caption = createText.Caption,
-                            attachmentIds = createText.attachmentIds
+                            WidgetCarouselAttachment = createText.attachmentIds
+                            .Select(id => new CarouselItem
+                            {
+                                id = id,
+                                widgetCarouselId = id,
+                                attachmentId = id
+                            })
+                            .ToList()
                         });
 
                         // Perform the update
@@ -422,7 +429,14 @@ namespace RepositoryPattern.Services.WidgetService
                     Content = new Content
                     {
                         Caption = createText.Caption,
-                        attachmentIds = createText.attachmentIds
+                        WidgetCarouselAttachment = createText.attachmentIds
+                        .Select(id => new CarouselItem
+                        {
+                            id = id,
+                            widgetCarouselId = id,
+                            attachmentId = id
+                        })
+                        .ToList()
                     }
                 };
 
