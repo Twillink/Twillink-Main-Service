@@ -119,7 +119,7 @@ namespace RepositoryPattern.Services.WidgetService
                     WidgetSchedule = x.typeWidget == "schedule" ? x.Content : null, // Only set if typeWidget is "schedule"
                     WidgetWebinar = x.typeWidget == "webinar" ? x.Content : null, // Only set if typeWidget is "webinar"
                     WidgetPdf = x.typeWidget == "pdf" ? x.Content : null, // Only set if typeWidget is "pdf"
-                    
+
                     x.CreatedAt,
                     x.UpdatedAt,
                     x.UserId,
@@ -382,11 +382,11 @@ namespace RepositoryPattern.Services.WidgetService
                         Title = createText.Title,
                         UrlWebinar = createText.UrlWebinar,
                         urlThumbnail = createText.UrlThumbnail,
-                        Description=createText.Description,
-                        Notes=createText.Notes,
-                        Passcode=createText.Passcode,
-                        StartDate=createText.StartDate,
-                        EndDate=createText.EndDate
+                        Description = createText.Description,
+                        Notes = createText.Notes,
+                        Passcode = createText.Passcode,
+                        StartDate = createText.StartDate,
+                        EndDate = createText.EndDate
                     }
                 };
 
@@ -407,6 +407,34 @@ namespace RepositoryPattern.Services.WidgetService
                 var items = await addLink.Find(_ => _.UserId == idUser).ToListAsync();
                 long count = items.Count();
 
+                foreach (var item in items)
+                {
+                    if (item.typeWidget == "schedule")
+                    {
+                        // Define the filter by Id
+                        var filter = Builders<AddLink>.Filter.Eq(_ => _.Id, item.Id);
+
+                        // Define the update for the Content field
+                        var update = Builders<AddLink>.Update.Set(_ => _.Content, new Content
+                        {
+                            Caption = createText.Caption,
+                            WidgetSchedule = createText.ScheduleItem
+                            .Select(id => new ScheduleItem
+                            {
+                                id = id.id,
+                                Date = id.Date,
+                                StartTime = id.StartTime,
+                                EndTime = id.EndTime,
+                            })
+                            .ToList()
+                        });
+
+                        // Perform the update
+                        await addLink.UpdateOneAsync(filter, update);
+                        return new { code = 200, message = "Berhasil" };
+                    }
+                }
+
                 var uuid = Guid.NewGuid().ToString();
                 var itemNew = new AddLink()
                 {
@@ -418,10 +446,16 @@ namespace RepositoryPattern.Services.WidgetService
                     CreatedAt = DateTime.Now,
                     Content = new Content
                     {
-                        Date=createText.Date,
-                        StartTime=createText.StartTime,
-                        EndTime=createText.EndTime
-
+                        Caption = createText.Caption,
+                        WidgetSchedule = createText.ScheduleItem
+                        .Select(id => new ScheduleItem
+                        {
+                            id = id.id,
+                            Date = id.Date,
+                            StartTime = id.StartTime,
+                            EndTime = id.EndTime,
+                        })
+                        .ToList()
                     }
                 };
 
@@ -607,7 +641,7 @@ namespace RepositoryPattern.Services.WidgetService
                 // Define the filter using the UserId and Key
                 var filter = Builders<AddSosmed>.Filter.And(
                     Builders<AddSosmed>.Filter.Eq(x => x.UserId, idUser),
-                    Builders<AddSosmed>.Filter.Eq(x => x.Key, idUser+"/"+createText.Key)
+                    Builders<AddSosmed>.Filter.Eq(x => x.Key, idUser + "/" + createText.Key)
                 );
 
                 // Check if the item exists
@@ -618,7 +652,7 @@ namespace RepositoryPattern.Services.WidgetService
                     // Create the updated document
                     var updatedItem = new AddSosmed
                     {
-                        Key = idUser+"/"+createText.Key,
+                        Key = idUser + "/" + createText.Key,
                         Value = createText.Value,
                         UserId = idUser
                     };
@@ -631,7 +665,7 @@ namespace RepositoryPattern.Services.WidgetService
                 // If the item does not exist, insert a new document
                 var newItem = new AddSosmed
                 {
-                    Key = idUser+"/"+createText.Key,
+                    Key = idUser + "/" + createText.Key,
                     Value = createText.Value,
                     UserId = idUser
                 };
@@ -751,7 +785,7 @@ namespace RepositoryPattern.Services.WidgetService
         {
             try
             {
-                await addSosmed.DeleteOneAsync(o => o.Key == idUser+"/"+Key);    
+                await addSosmed.DeleteOneAsync(o => o.Key == idUser + "/" + Key);
                 return new { code = 200, message = "Berhasil" };
             }
             catch (CustomException ex)

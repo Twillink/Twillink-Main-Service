@@ -1,3 +1,5 @@
+using Twillink.Shared.Models;
+
 public class CreateWidgetDto
 {
     public string? Name { get; set; }
@@ -122,9 +124,12 @@ public class CreateWebinar
 
 public class CreateSchedule
 {
-    public DateTime? Date { get; set; }
-    public string? StartTime { get; set; }
-    public string? EndTime { get; set; }
+    // public DateTime? Date { get; set; }
+    // public string? StartTime { get; set; }
+    // public string? EndTime { get; set; }
+    public string? Caption { get; set; }
+    public List<ScheduleItem>? ScheduleItem { get; set; }
+
 
 }
 
