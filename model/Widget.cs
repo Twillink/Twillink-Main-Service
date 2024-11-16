@@ -245,5 +245,7 @@ namespace Twillink.Shared.Models
 
         [BsonElement("path")]
         public string? path {get; set;}
+        [BsonElement("size")]
+        public long? size {get; set;}
     }
 }

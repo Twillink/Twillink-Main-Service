@@ -43,6 +43,7 @@ namespace RepositoryPattern.Services.AttachmentService
         {
             var bucket = bucketName;
             var folderName = "uploads";
+            var fileSize = file.Length;
 
             // Baca file sebagai stream
             using var memoryStream = new MemoryStream();
@@ -66,6 +67,7 @@ namespace RepositoryPattern.Services.AttachmentService
                 type = file.ContentType,
                 path = url,
                 UserId = idUser,
+                size = fileSize,
                 CreatedAt = DateTime.Now,
             };
 
