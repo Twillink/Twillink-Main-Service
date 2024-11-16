@@ -57,9 +57,6 @@ namespace Twillink.Shared.Models
         [BsonElement("UrlWebinar")]
         public string? UrlWebinar {get; set;}
 
-        [BsonElement("UrlThumbnail")]
-        public string? UrlThumbnail {get; set;}
-
         [BsonElement("Notes")]
         public string? Notes {get; set;}
 

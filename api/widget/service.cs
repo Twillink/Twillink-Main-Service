@@ -372,7 +372,7 @@ namespace RepositoryPattern.Services.WidgetService
                     {
                         Title = createText.Title,
                         UrlWebinar = createText.UrlWebinar,
-                        UrlThumbnail = createText.UrlThumbnail,
+                        urlThumbnail = createText.UrlThumbnail,
                         Description=createText.Description,
                         Notes=createText.Notes,
                         Passcode=createText.Passcode,
