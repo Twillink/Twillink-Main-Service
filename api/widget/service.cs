@@ -48,6 +48,11 @@ namespace RepositoryPattern.Services.WidgetService
                     WidgetMap = x.typeWidget == "map" ? x.Content : null, // Only set if typeWidget is "video"
                     WidgetContact = x.typeWidget == "contact" ? x.Content : null, // Only set if typeWidget is "video"
                     WidgetImage = x.typeWidget == "image" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetSchedule = x.typeWidget == "schedule" ? x.Content : null, // Only set if typeWidget is "schedule"
+                    WidgetWebinar = x.typeWidget == "webinar" ? x.Content : null, // Only set if typeWidget is "webinar"
+                    WidgetPdf = x.typeWidget == "pdf" ? x.Content : null, // Only set if typeWidget is "pdf"
+
+
                     x.CreatedAt,
                     x.UpdatedAt,
                     x.UserId,
@@ -111,6 +116,10 @@ namespace RepositoryPattern.Services.WidgetService
                     WidgetMap = x.typeWidget == "map" ? x.Content : null, // Only set if typeWidget is "video"
                     WidgetContact = x.typeWidget == "contact" ? x.Content : null, // Only set if typeWidget is "video"
                     WidgetImage = x.typeWidget == "image" ? x.Content : null, // Only set if typeWidget is "video"
+                    WidgetSchedule = x.typeWidget == "schedule" ? x.Content : null, // Only set if typeWidget is "schedule"
+                    WidgetWebinar = x.typeWidget == "webinar" ? x.Content : null, // Only set if typeWidget is "webinar"
+                    WidgetPdf = x.typeWidget == "pdf" ? x.Content : null, // Only set if typeWidget is "pdf"
+                    
                     x.CreatedAt,
                     x.UpdatedAt,
                     x.UserId,

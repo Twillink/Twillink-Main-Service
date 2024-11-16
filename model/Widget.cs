@@ -53,6 +53,8 @@ namespace Twillink.Shared.Models
         public string? PhoneNumber {get; set;}
         [BsonElement("widgetCarouselAttachment")]
         public List<CarouselItem>? WidgetCarouselAttachment {get; set;}
+        public List<ScheduleItem>? WidgetSchedule {get; set;}
+
 
         [BsonElement("UrlWebinar")]
         public string? UrlWebinar {get; set;}
@@ -77,6 +79,22 @@ namespace Twillink.Shared.Models
 
         [BsonElement("EndTime")]
         public string? EndTime {get; set;}
+
+    }
+
+    public class ScheduleItem
+    {
+        [BsonElement("id")]
+        public string? id {get; set;}
+        [BsonElement("Date")]
+
+        public DateTime? Date { get; set; }
+        [BsonElement("StartTime")]
+
+        public string? StartTime { get; set; }
+        [BsonElement("EndTime")]
+
+        public string? EndTime { get; set; }
 
     }
 
