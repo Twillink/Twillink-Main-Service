@@ -110,16 +110,22 @@ public class CreateWebinar
 {
 
     public string? Title { get; set; }
-
-    public string? UrlLink { get; set; }
-
+    public string? UrlWebinar { get; set; }
+    public string? UrlThumbnail { get; set; }
+    public string? Description { get; set; }
+    public string? Notes { get; set; }
     public string? Passcode { get; set; }
-
     public DateTime? StartDate { get; set; }
-
     public DateTime? EndDate { get; set; }
 
-    public string? Desc { get; set; }
+}
+
+public class CreateSchedule
+{
+    public DateTime? Date { get; set; }
+    public string? StartTime { get; set; }
+    public string? EndTime { get; set; }
+
 }
 
 public class CreateBanner

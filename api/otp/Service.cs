@@ -73,7 +73,7 @@ namespace RepositoryPattern.Services.OtpService
                 throw new CustomException(400, "Message", "OTP invalid");
 
             // Hapus OTP setelah validasi
-            await _otpCollection.DeleteOneAsync(o => o.Id == otp.Id);
+            // await _otpCollection.DeleteOneAsync(o => o.Id == otp.Id);
             return "OTP valid";
         }
 

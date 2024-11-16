@@ -54,6 +54,33 @@ namespace Twillink.Shared.Models
         [BsonElement("widgetCarouselAttachment")]
         public List<CarouselItem>? WidgetCarouselAttachment {get; set;}
 
+        [BsonElement("UrlWebinar")]
+        public string? UrlWebinar {get; set;}
+
+        [BsonElement("UrlThumbnail")]
+        public string? UrlThumbnail {get; set;}
+
+        [BsonElement("Notes")]
+        public string? Notes {get; set;}
+
+        [BsonElement("Passcode")]
+        public string? Passcode {get; set;}
+
+        [BsonElement("StartDate")]
+        public DateTime? StartDate {get; set;}
+
+        [BsonElement("EndDate")]
+        public DateTime? EndDate {get; set;}
+
+        [BsonElement("Date")]
+        public DateTime? Date {get; set;}
+
+        [BsonElement("StartTime")]
+        public string? StartTime {get; set;}
+
+        [BsonElement("EndTime")]
+        public string? EndTime {get; set;}
+
     }
 
     public class CarouselItem

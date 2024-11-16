@@ -181,6 +181,26 @@ namespace Twillink.Server.Controllers
 
         [Authorize]
         [HttpPost]
+        [Route("widget-pdf")]
+        public async Task<object> AddPdf([FromBody] CreateImage item )
+        {
+            try
+            {
+                string accessToken = HttpContext.Request.Headers["Authorization"];
+                string idUser = await _ConvertJwt.ConvertString(accessToken);
+                var data = await _IWidgetService.AddPdf(idUser, item);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
         [Route("widget-video")]
         public async Task<object> AddVideo([FromBody] CreateImage item )
         {
@@ -329,6 +349,46 @@ namespace Twillink.Server.Controllers
                 string accessToken = HttpContext.Request.Headers["Authorization"];
                 string idUser = await _ConvertJwt.ConvertString(accessToken);
                 var data = await _IWidgetService.AddCarousel(idUser, item);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("widget-webinar")]
+        public async Task<object> AddWebinar([FromBody] CreateWebinar item )
+        {
+            try
+            {
+                string accessToken = HttpContext.Request.Headers["Authorization"];
+                string idUser = await _ConvertJwt.ConvertString(accessToken);
+                var data = await _IWidgetService.AddWebinar(idUser, item);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("widget-schedule")]
+        public async Task<object> AddSchedule([FromBody] CreateSchedule item )
+        {
+            try
+            {
+                string accessToken = HttpContext.Request.Headers["Authorization"];
+                string idUser = await _ConvertJwt.ConvertString(accessToken);
+                var data = await _IWidgetService.AddSchedule(idUser, item);
                 return Ok(data);
             }
             catch (CustomException ex)

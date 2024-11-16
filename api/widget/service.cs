@@ -37,7 +37,7 @@ namespace RepositoryPattern.Services.WidgetService
                 }
 
                 var filteredWidget = await addText.Find(_ => _.UserId == items.Id).SortBy(_ => _.sequence).ToListAsync();
-                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact" || x.typeWidget != "profile").Select(x => new
+                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact" || x.typeWidget != "profile" || x.typeWidget != "sosmed").Select(x => new
                 {
                     x.Id,
                     WidgetText = x.typeWidget == "text" ? x.Content : null, // Only set if typeWidget is "text"
@@ -100,7 +100,7 @@ namespace RepositoryPattern.Services.WidgetService
                 }
 
                 var filteredWidget = await addText.Find(_ => _.UserId == items.Id).SortBy(_ => _.sequence).ToListAsync();
-                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact" || x.typeWidget != "profile").Select(x => new
+                var WidgetList = filteredWidget.Where(x => x.typeWidget != "contact" || x.typeWidget != "profile" || x.typeWidget != "sosmed").Select(x => new
                 {
                     x.Id,
                     WidgetText = x.typeWidget == "text" ? x.Content : null, // Only set if typeWidget is "text"
@@ -251,6 +251,39 @@ namespace RepositoryPattern.Services.WidgetService
             }
         }
 
+        public async Task<object> AddPdf(string idUser, CreateImage createText)
+        {
+            try
+            {
+                var items = await addLink.Find(_ => _.UserId == idUser).ToListAsync();
+                long count = items.Count();
+
+                var uuid = Guid.NewGuid().ToString();
+                var itemNew = new AddLink()
+                {
+                    Id = uuid,
+                    UserId = idUser,
+                    sequence = count + 1,
+                    typeWidget = "pdf",
+                    width = "100%",
+                    CreatedAt = DateTime.Now,
+                    Content = new Content
+                    {
+                        Caption = createText.Caption,
+                        Url = createText.Url,
+                    }
+                };
+
+                await addLink.InsertOneAsync(itemNew);
+                return new { code = 200, message = "Berhasil" };
+            }
+            catch (CustomException ex)
+            {
+
+                throw new CustomException(400, "Error", ex.Message); ;
+            }
+        }
+
         public async Task<object> AddVideo(string idUser, CreateImage createText)
         {
             try
@@ -306,6 +339,80 @@ namespace RepositoryPattern.Services.WidgetService
                         Title = createText.Title,
                         Url = createText.Url,
                         Contents = createText.Content,
+                    }
+                };
+
+                await addLink.InsertOneAsync(itemNew);
+                return new { code = 200, message = "Berhasil" };
+            }
+            catch (CustomException ex)
+            {
+
+                throw new CustomException(400, "Error", ex.Message); ;
+            }
+        }
+
+        public async Task<object> AddWebinar(string idUser, CreateWebinar createText)
+        {
+            try
+            {
+                var items = await addLink.Find(_ => _.UserId == idUser).ToListAsync();
+                long count = items.Count();
+
+                var uuid = Guid.NewGuid().ToString();
+                var itemNew = new AddLink()
+                {
+                    Id = uuid,
+                    UserId = idUser,
+                    sequence = count + 1,
+                    typeWidget = "webinar",
+                    width = "100%",
+                    CreatedAt = DateTime.Now,
+                    Content = new Content
+                    {
+                        Title = createText.Title,
+                        UrlWebinar = createText.UrlWebinar,
+                        UrlThumbnail = createText.UrlThumbnail,
+                        Description=createText.Description,
+                        Notes=createText.Notes,
+                        Passcode=createText.Passcode,
+                        StartDate=createText.StartDate,
+                        EndDate=createText.EndDate
+                    }
+                };
+
+                await addLink.InsertOneAsync(itemNew);
+                return new { code = 200, message = "Berhasil" };
+            }
+            catch (CustomException ex)
+            {
+
+                throw new CustomException(400, "Error", ex.Message); ;
+            }
+        }
+
+        public async Task<object> AddSchedule(string idUser, CreateSchedule createText)
+        {
+            try
+            {
+                var items = await addLink.Find(_ => _.UserId == idUser).ToListAsync();
+                long count = items.Count();
+
+                var uuid = Guid.NewGuid().ToString();
+                var itemNew = new AddLink()
+                {
+                    Id = uuid,
+                    UserId = idUser,
+                    sequence = count + 1,
+                    typeWidget = "schedule",
+                    width = "100%",
+                    CreatedAt = DateTime.Now,
+                    Content = new Content
+                    {
+                        Date=createText.Date,
+                        StartTime=createText.StartTime,
+                        EndTime=createText.EndTime
+
                     }
                 };
 
