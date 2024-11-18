@@ -126,13 +126,14 @@ namespace RepositoryPattern.Services.AuthService
             try
             {
                 var roleData = await dataUser.Find(x => x.Id == id).FirstOrDefaultAsync();
+                bool checkPass = BCrypt.Net.BCrypt.Verify(item.currentPassword, roleData.Password);
                 if (roleData == null)
                 {
                     throw new CustomException(400, "Error", "Data tidak ada");
                 }
-                if (roleData.Password != item.currentPassword)
+                if (!checkPass)
                 {
-                    throw new CustomException(400, "Error", "Data tidak ada");
+                    throw new CustomException(400, "Error", "Password tidak sama");
                 }
                 if (item.newPassword.Length < 8)
                 {
