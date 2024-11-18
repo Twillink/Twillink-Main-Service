@@ -124,6 +124,22 @@ namespace Twillink.Server.Controllers
         //     }
         // }
 
+        [HttpGet]
+        [Route("{fileName}")]
+        public IActionResult GetFile(string fileName)
+        {
+            var filePath = Path.Combine("/home/hilyatulw/twillink/Twillink-Main-Service/publish/wwwroot/uploads", fileName);
+
+            if (System.IO.File.Exists(filePath))
+            {
+                var fileBytes = System.IO.File.ReadAllBytes(filePath);
+                return File(fileBytes, "application/octet-stream", fileName);
+            }
+
+            return NotFound();
+        }
+
+
         [Authorize]
         [HttpPost]
         [Route("Upload")]
@@ -157,7 +173,7 @@ namespace Twillink.Server.Controllers
                 var fileName = $"{Guid.NewGuid()}-{file.FileName}";
 
                 // Define the path to save the file
-                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", idUser);
+                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
                 if (!Directory.Exists(uploadPath))
                 {
                     Directory.CreateDirectory(uploadPath);
@@ -176,7 +192,7 @@ namespace Twillink.Server.Controllers
                 {
                     status = true,
                     fileName,
-                    path = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/{idUser}/{fileName}" // Relative path for accessing the file
+                    path = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/uploads/{fileName}" // Relative path for accessing the file
                 });
             }
             catch (CustomException ex)
