@@ -107,36 +107,16 @@ namespace Twillink.Server.Controllers
 
                 if (file == null || file.Length == 0)
                 {
-                    throw new CustomException(400, "Message", "File Not Found");
+                    throw new CustomException(400, "Message", "File not found");
                 }
 
-                // Define allowed MIME types for images and videos
-                var allowedImageTypes = new[] { "application/pdf", "image/jpeg", "image/png", "image/gif", "image/jpeg" };
-                var allowedVideoTypes = new[] { "video/mp4", "video/mpeg", "video/quicktime" };
+                // Define max file size: 200 MB (for any file type)
+                const long maxFileSize = 200 * 1024 * 1024; // 200 MB
 
-                // Define max file size: 2 MB for images, 50 MB for videos
-                const long maxImageSize = 2 * 1024 * 1024; // 2 MB
-                const long maxVideoSize = 50 * 1024 * 1024; // 50 MB
-
-                // Check if the file is an image
-                if (Array.Exists(allowedImageTypes, type => type.Equals(file.ContentType, StringComparison.OrdinalIgnoreCase)))
+                // Validate file size
+                if (file.Length > maxFileSize)
                 {
-                    if (file.Length > maxImageSize)
-                    {
-                        throw new CustomException(400, "Message", "Image size must not exceed 2 MB.");
-                    }
-                }
-                // Check if the file is a video
-                else if (Array.Exists(allowedVideoTypes, type => type.Equals(file.ContentType, StringComparison.OrdinalIgnoreCase)))
-                {
-                    if (file.Length > maxVideoSize)
-                    {
-                        throw new CustomException(400, "Message", "Video size must not exceed 50 MB.");
-                    }
-                }
-                else
-                {
-                    throw new CustomException(400, "Message", "Only image (JPEG, PNG, GIF) or video (MP4, MPEG, MOV) files are allowed.");
+                    throw new CustomException(400, "Message", "File size must not exceed 200 MB.");
                 }
 
                 // Convert file to byte array
@@ -181,6 +161,7 @@ namespace Twillink.Server.Controllers
                 return StatusCode(500, new { status = false, message = "An error occurred", details = ex.Message });
             }
         }
+
 
         // [Authorize]
         // [HttpPost]
