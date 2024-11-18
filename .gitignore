@@ -28,6 +28,7 @@ Thumbs.db
 *.tmp
 *.swp
 *.swo
+wwwroot
 
 /bin/
 /obj/
