@@ -343,12 +343,12 @@ namespace RepositoryPattern.Services.AuthService
                 {
                     return "Email Not Found";
                 }
-                return "Available";
+                throw new CustomException(400,"Message", "Already Registered");
             }
             catch (Exception ex)
             {
 
-                throw new CustomException(400,"Message", $"ForgotPassword Error: {ex.Message}");
+                throw new CustomException(400,"Message", $"{ex.Message}");
             }
         }
     }

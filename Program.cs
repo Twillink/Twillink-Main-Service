@@ -11,6 +11,7 @@ using SendingEmail;
 using RepositoryPattern.Services.LinkUrlService;
 using RepositoryPattern.Services.WidgetService;
 using RepositoryPattern.Services.AttachmentService;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -107,6 +108,16 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 300 * 1024 * 1024; // 50 MB
+});
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 300 * 1024 * 1024; // 200 MB
+});
+
 var app = builder.Build();
 
 app.Use(async (context, next) =>
@@ -124,11 +135,20 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blazor API V1");
 });
 
+
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseStaticFiles();
 app.Use(async (context, next) =>
     {
+        // Check if the IHttpMaxRequestBodySizeFeature is available
+        var maxRequestBodySizeFeature = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
+        if (maxRequestBodySizeFeature != null)
+        {
+            // Set the max request body size to 50 MB
+            maxRequestBodySizeFeature.MaxRequestBodySize = 200 * 1024 * 1024;
+        }
+
         await next();
 
         if (context.Response.StatusCode == (int)HttpStatusCode.Unauthorized) // 401
