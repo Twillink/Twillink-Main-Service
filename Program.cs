@@ -11,6 +11,8 @@ using SendingEmail;
 using RepositoryPattern.Services.LinkUrlService;
 using RepositoryPattern.Services.WidgetService;
 using RepositoryPattern.Services.AttachmentService;
+using RepositoryPattern.Services.TwilmeetService;
+
 using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +25,8 @@ builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<ILinkUrlService, LinkUrlService>();
 builder.Services.AddScoped<IWidgetService, WidgetService>();
 builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+builder.Services.AddScoped<ITwilmeetService, TwilmeetService>();
+
 
 
 
