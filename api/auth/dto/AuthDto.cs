@@ -58,3 +58,10 @@ public class ChangeUserPasswordDto {
     public string? newPassword { get; set; }
 
 }
+
+public class ZoomGetDto {
+    public string MeetingNumber { get; set; }
+        public int Role { get; set; } // 0 for participant, 1 for host
+        public int? ExpirationSeconds { get; set; }
+
+}
