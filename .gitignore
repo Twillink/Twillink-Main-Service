@@ -36,3 +36,4 @@ wwwroot
 .idea
 .fake
 .vscode/launch.json
+.credent

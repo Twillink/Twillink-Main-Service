@@ -49,7 +49,7 @@ namespace Twillink.Shared.Models
         public bool? IsClass { get; set; }
         [BsonElement("Class")]
 
-        public string[]? Class { get; set; }
+        public string[]? Classes { get; set; }
         [BsonElement("Price")]
 
         public float? Price { get; set; }

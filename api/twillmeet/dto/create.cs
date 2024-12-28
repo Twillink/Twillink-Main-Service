@@ -13,7 +13,7 @@ public class CreateTwilmeetDto
     public bool? IsPaid { get; set; }
     public bool? IsCertificate { get; set; }
     public bool? IsClass { get; set; }
-    public string[]? Class { get; set; }
+    public string[]? Classes { get; set; }
 
 }
 

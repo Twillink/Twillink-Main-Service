@@ -37,7 +37,7 @@ namespace RepositoryPattern.Services.TwilmeetService
                 foreach (var user in activeUsers)
                 {
                     // Fetch payments for the current user
-                    var payments = await dataPayment.Find(payment => payment.IdItem == user.Id && payment.IsVerification ==true).ToListAsync();
+                    var payments = await dataPayment.Find(payment => payment.IdItem == user.Id && payment.IsVerification == true).ToListAsync();
 
                     // Add user and their payments to the dictionary
                     groupedPayments[user.Id] = payments;
@@ -49,9 +49,10 @@ namespace RepositoryPattern.Services.TwilmeetService
                     Id = user.Id,
                     Price = user.Price, // Adjust the field based on your model
                     Owner = user.IdUser,
+                    InfoItem = user,
                     Member = groupedPayments.ContainsKey(user.Id) ? groupedPayments[user.Id] : new List<Payment>()
                 });
-                        // Return response with the collected results
+                // Return response with the collected results
                 return new { code = 200, data = response, message = "Data fetched successfully." };
             }
             catch (Exception ex)
@@ -86,6 +87,17 @@ namespace RepositoryPattern.Services.TwilmeetService
                     IsPaid = item.IsPaid,
                     Price = item.Price,
                     IsActive = true,
+                    Thumbnail = item.Thumbnail,
+                    Title = item.Title,
+                    Desc = item.Desc,
+                    Date = item.Date,
+                    Time = item.Time,
+                    Category = item.Category,
+                    Languange = item.Languange,
+                    Tags = item.Tags,
+                    IsCertificate = item.IsCertificate,
+                    IsClass = item.IsClass,
+                    Classes = item.Classes,
                     IsVerification = item.IsPaid == true ? false : true,
                     CreatedAt = DateTime.Now
                 };
@@ -176,5 +188,24 @@ namespace RepositoryPattern.Services.TwilmeetService
                 throw;
             }
         }
+
+        public async Task<object> CreateLinkMeet(string idUser)
+        {
+            try
+            {
+                // Call ZoomService to create the meeting
+                var zoomService = new ZoomService();
+                var meetingDetails = await zoomService.CreateLinkMeet(idUser);
+
+                // Return the meeting details as an object
+                return meetingDetails;
+            }
+            catch (Exception ex)
+            {
+                // Handle and log the error
+                throw new CustomException(500, "Error Creating Zoom Meeting", ex.Message);
+            }
+        }
+
     }
 }

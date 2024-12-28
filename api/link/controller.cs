@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace Twillink.Server.Controllers
 {
     [ApiController]
@@ -25,6 +26,23 @@ namespace Twillink.Server.Controllers
             try
             {
                 var data = await _ILinkUrlService.GetById(userName);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("gmeetcreate/{userName}")]
+        public async Task<object> gmeetcreate([FromRoute] string userName)
+        {
+            try
+            {
+                var data = await _ILinkUrlService.gmeetcreate(userName);
                 return Ok(data);
             }
             catch (CustomException ex)

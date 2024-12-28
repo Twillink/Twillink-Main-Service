@@ -20,7 +20,7 @@ namespace SendingEmail
         {
             try
             {
-                var email = "no-reply@coderchamps.co.id";
+                var email = "admin@coderchamps.co.id";
                 var password = "hgzzbtjqvbbovjvr";
 
                 var client = new SmtpClient("smtp.gmail.com", 587)

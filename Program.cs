@@ -38,6 +38,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ConvertJWT>();
 builder.Services.AddSingleton<ValidationUserDto>();
 builder.Services.AddSingleton<ValidationAuthDto>();
+builder.Services.AddSingleton<ZoomService>();
+
 builder.Services.AddHttpClient();
 
 builder.Services.AddAuthentication(options =>
