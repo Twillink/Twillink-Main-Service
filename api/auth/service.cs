@@ -133,7 +133,7 @@ namespace RepositoryPattern.Services.AuthService
                     IsVerification = true,
                     IdRole = Roles.User,
                     CreatedAt = DateTime.Now,
-                    CodeMeeting= "-"
+                    CodeMeeting= ""
                 };
 
                 await dataUser.InsertOneAsync(roleData);
@@ -188,7 +188,7 @@ namespace RepositoryPattern.Services.AuthService
                     IsVerification = true,
                     IdRole = Roles.User,
                     CreatedAt = DateTime.Now,
-                    CodeMeeting="-"
+                    CodeMeeting= ""
                 };
 
                 await dataUser.InsertOneAsync(roleData);
@@ -388,6 +388,29 @@ namespace RepositoryPattern.Services.AuthService
                 }
                 string idAsString = user.Id.ToString();
                 return new { code = 200, Message = "Berhasil" };
+            }
+            catch (CustomException ex)
+            {
+                throw;
+            }
+        }
+
+         public async Task<Object> CheckStatus([FromBody]string id)
+        {
+            try
+            {
+                var user = await dataUser.Find(u => u.Id == id).FirstOrDefaultAsync();
+                if (user == null)
+                {
+                    throw new CustomException(400, "Email", "Email tidak ditemukan");
+                }
+
+                if(user.CodeMeeting == "")
+                {
+                    return new { code = 200, Status = "Normal", CodeMeetings = user.CodeMeeting };
+                }else{
+                    return new { code = 200, Status = "Pro" , CodeMeetings = user.CodeMeeting};
+                }
             }
             catch (CustomException ex)
             {

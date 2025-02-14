@@ -15,6 +15,7 @@ public interface IAuthService
     Task<Object> VerifyPin(string id);
     Task<Object> CheckPin(PinDto pin, string id);
     Task<string> CheckMail(string email);
+    Task<Object> CheckStatus(string uid);
 
     Task<Object> RequestOtpEmail(string id);
 

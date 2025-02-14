@@ -213,6 +213,25 @@ namespace Twillink.Server.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("check-status")]
+        public async Task<object> CheckStatus()
+        {
+            try
+            {
+                string accessToken = HttpContext.Request.Headers["Authorization"];
+                string idUser = await _ConvertJwt.ConvertString(accessToken);
+                var dataList = await _IAuthService.CheckStatus(idUser);
+                return Ok(dataList);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
         // [AllowAnonymous]
         // [HttpGet]
         // [Route("activation/{UID}")]
