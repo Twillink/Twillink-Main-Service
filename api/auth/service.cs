@@ -133,7 +133,7 @@ namespace RepositoryPattern.Services.AuthService
                     IsVerification = true,
                     IdRole = Roles.User,
                     CreatedAt = DateTime.Now,
-                    CodeMeeting= ""
+                    CodeMeeting= "-"
                 };
 
                 await dataUser.InsertOneAsync(roleData);
@@ -188,7 +188,7 @@ namespace RepositoryPattern.Services.AuthService
                     IsVerification = true,
                     IdRole = Roles.User,
                     CreatedAt = DateTime.Now,
-                    CodeMeeting=""
+                    CodeMeeting="-"
                 };
 
                 await dataUser.InsertOneAsync(roleData);
