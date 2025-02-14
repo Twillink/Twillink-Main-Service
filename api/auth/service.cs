@@ -3,6 +3,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using CheckId;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -69,6 +70,43 @@ namespace RepositoryPattern.Services.AuthService
             }
         }
 
+        public async Task<Object> LoginGoogleAsync([FromBody] string login)
+        {
+            try
+            {
+                var user = await dataUser.Find(u => u.Email == login).FirstOrDefaultAsync();
+                if (user == null)
+                {
+                    throw new CustomException(400, "Email", "Email tidak ditemukan");
+                }
+                // bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(login.Password, user.Password);
+                // if (!isPasswordCorrect)
+                // {
+                //     throw new CustomException(400, "Password", "Password Salah");
+                // }
+                if (user.IsActive == false)
+                {
+                    throw new CustomException(400, "Message", "Akun anda tidak perbolehkan akses");
+                }
+                if (user.IsVerification == false)
+                {
+                    throw new CustomException(400, "Message", "Akun anda belum aktif, silahkan aktifasi melalui link kami kirimkan di email anda");
+                }
+
+                var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
+                var jwtService = new JwtService(configuration);
+                string userId = user.Id;
+                string token = jwtService.GenerateJwtToken(userId);
+                string idAsString = userId.ToString();
+                return new { code = 200, id = idAsString, accessToken = token };
+            }
+            catch (CustomException ex)
+            {
+
+                throw;
+            }
+        }
+
         public async Task<object> RegisterAsync([FromBody] RegisterDto data)
         {
             try
@@ -90,6 +128,60 @@ namespace RepositoryPattern.Services.AuthService
                     FullName = data.FullName,
                     PhoneNumber = data.PhoneNumber,
                     Email = data.Email,
+                    Password = hashedPassword,
+                    IsActive = true,
+                    IsVerification = true,
+                    IdRole = Roles.User,
+                    CreatedAt = DateTime.Now
+                };
+
+                await dataUser.InsertOneAsync(roleData);
+                string roleIdAsString = roleData.Id.ToString();
+
+                // var email = new EmailForm()
+                // {
+                //     Id = uuid,
+                //     Email = data.Email,
+                //     Subject = "Activation Twillink",
+                //     Message = "Activation"
+                // };
+                var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
+                var jwtService = new JwtService(configuration);
+                string userId = roleData.Id;
+                string token = jwtService.GenerateJwtToken(userId);
+                // var sending = _emailService.SendEmailAsync(email);
+                return new { code = 200, id = roleIdAsString, accessToken = token };
+            }
+            catch (CustomException ex)
+            {
+
+                throw new CustomException(400, "Error", ex.Message);;
+            }
+        }
+
+        public async Task<object> RegisterGoogleAsync([FromBody] string data, RegisterGoogleDto login)
+        {
+            try
+            {
+                var payload = JsonSerializer.Deserialize<JwtPayloads>(data);
+
+                var user = await dataUser.Find(u => u.Email == payload.Email).FirstOrDefaultAsync();
+
+                if (user != null)
+                {
+                    throw new CustomException(400, "Email", "Email Sudah digunakan");
+                }
+
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(payload.Audience);
+                var uuid = Guid.NewGuid().ToString();
+
+                var roleData = new User()
+                {
+                    Id = uuid,
+                    Username = login.Username,
+                    FullName = payload.Name,
+                    PhoneNumber = "",
+                    Email = payload.Email,
                     Password = hashedPassword,
                     IsActive = true,
                     IsVerification = true,

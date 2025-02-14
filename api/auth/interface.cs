@@ -2,7 +2,11 @@
 public interface IAuthService
 {
     Task<Object> LoginAsync(LoginDto model);
+    Task<Object> LoginGoogleAsync(string model);
+
     Task<Object> RegisterAsync(RegisterDto model);
+    Task<Object> RegisterGoogleAsync(string model,RegisterGoogleDto login);
+
     Task<Object> Aktifasi(string id);
     Task<Object> UpdatePassword(string id, ChangeUserPasswordDto model);
     Task<string> ForgotPasswordAsync(UpdateUserAuthDto model);

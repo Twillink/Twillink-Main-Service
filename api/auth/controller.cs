@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -73,6 +74,82 @@ namespace Twillink.Server.Controllers
                 }
                 var response = await _IAuthService.LoginAsync(login);
                 return Ok(response);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("loginGoogle")]
+        public async Task<object> LoginGoogleAsync([FromBody] LoginGoogleDto login)
+        {
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadToken(login.Token) as JwtSecurityToken;
+
+                if (jsonToken != null)
+                {
+                    var payloadJson = jsonToken.Payload.SerializeToJson();
+                    var payload = JsonSerializer.Deserialize<JwtPayloads>(payloadJson);
+                    if (payload.Audience == "twillink-de")
+                    {
+                        var response = await _IAuthService.LoginGoogleAsync(payload.Email);
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        throw new CustomException(400, "Token", "Invalid Token");
+                    }
+                }
+                else
+                {
+                    throw new CustomException(400, "Token", "Invalid Token");
+                }
+
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("registerGoogle")]
+        public async Task<object> RegisterGoogleAsync([FromBody] RegisterGoogleDto login)
+        {
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadToken(login.Token) as JwtSecurityToken;
+
+                if (jsonToken != null)
+                {
+                    var payloadJson = jsonToken.Payload.SerializeToJson();
+                    var payload = JsonSerializer.Deserialize<JwtPayloads>(payloadJson);
+                    if (payload.Audience == "twillink-de")
+                    {
+                        var response = await _IAuthService.RegisterGoogleAsync(payloadJson, login);
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        throw new CustomException(400, "Token", "Invalid Token");
+                    }
+                }
+                else
+                {
+                    throw new CustomException(400, "Token", "Invalid Token");
+                }
+
             }
             catch (CustomException ex)
             {
