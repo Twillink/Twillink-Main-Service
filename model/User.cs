@@ -30,6 +30,9 @@ namespace Twillink.Shared.Models
         public string? Pin {get; set;}
         [BsonElement("Otp")]
         public string? Otp {get; set;}
+        
+        [BsonElement("CodeMeeting")]
+        public string? CodeMeeting {get; set;}
     
     }
 }
