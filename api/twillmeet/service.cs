@@ -1,3 +1,4 @@
+using System.Globalization;
 using MongoDB.Driver;
 using Twillink.Shared.Models;
 
@@ -9,11 +10,14 @@ namespace RepositoryPattern.Services.TwilmeetService
         private readonly IMongoCollection<Payment> dataPayment;
         private readonly IMongoCollection<User> dataListUser;
 
+        private readonly IWidgetService _IWidgetService;
+
 
         private readonly string key;
 
-        public TwilmeetService(IConfiguration configuration)
+        public TwilmeetService(IConfiguration configuration, IWidgetService roleService)
         {
+            _IWidgetService = roleService;
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
             IMongoDatabase database = client.GetDatabase("Twillink");
             dataUser = database.GetCollection<Twilmeet>("Twilmeets");
@@ -79,9 +83,10 @@ namespace RepositoryPattern.Services.TwilmeetService
         {
             try
             {
+                var guid =  Guid.NewGuid().ToString();
                 var TwilmeetData = new Twilmeet()
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = guid,
                     IdUser = idUser,
                     Type = item.Type,
                     IsPaid = item.IsPaid,
@@ -101,13 +106,39 @@ namespace RepositoryPattern.Services.TwilmeetService
                     IsVerification = item.IsPaid == true ? false : true,
                     CreatedAt = DateTime.Now
                 };
+
+                var createWidget = new CreateWebinar()
+                {
+                    Title = item.Title,
+                    UrlWebinar = guid.ToString(),
+                    UrlThumbnail = item.Thumbnail,
+                    Description = item.Desc,
+                    Notes = item.Price.ToString(),
+                    Passcode = "",
+                    StartDate = ParseDateTime(item.Date),
+                    EndDate = ParseDateTime(item.Time),
+                };
                 await dataUser.InsertOneAsync(TwilmeetData);
+                await _IWidgetService.AddWebinar(idUser, createWidget);
                 return new { code = 200, id = TwilmeetData.Id, message = "Data Add Complete" };
             }
             catch (CustomException)
             {
                 throw;
             }
+        }
+
+        private DateTime? ParseDateTime(string dateString)
+        {
+            if (string.IsNullOrWhiteSpace(dateString))
+                return null;
+
+            if (DateTime.TryParseExact(dateString, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+            {
+                return parsedDate;
+            }
+
+            return null; // Return null if parsing fails
         }
 
         public async Task<object> PostBuy(CreateBuyTwilmeetDto item, string idUser)
