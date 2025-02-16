@@ -155,7 +155,7 @@ namespace RepositoryPattern.Services.TwilmeetService
             return null; // Return null if parsing fails
         }
 
-        public async Task<object> PostBuy(CreateBuyTwilmeetDto item, string idUser)
+        public async Task<object> PostBuy(CreateBuyTwilmeetDto item)
         {
             try
             {

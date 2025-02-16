@@ -85,15 +85,7 @@ namespace Twillink.Server.Controllers
         {
             try
             {
-                var validationErrors = _masterValidationService.ValidateCreateBuyInput(item);
-                if (validationErrors.Count > 0)
-                {
-                    var errorResponse = new { code = 400, errorMessage = validationErrors };
-                    return BadRequest(errorResponse);
-                }
-                string accessToken = HttpContext.Request.Headers["Authorization"];
-                string idUser = await _ConvertJwt.ConvertString(accessToken);
-                var data = await _ITwilmeetService.PostBuy(item, idUser);
+                var data = await _ITwilmeetService.PostBuy(item);
                 return Ok(data);
             }
             catch (CustomException ex)
