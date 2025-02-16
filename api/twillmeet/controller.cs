@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Twillink.Server.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [ApiController]
     [Route("/api/v1/[controller]")]
     public class TwilmeetController : ControllerBase
@@ -55,7 +55,7 @@ namespace Twillink.Server.Controllers
             }
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<object> Post([FromBody] CreateTwilmeetDto item)
         {
@@ -127,7 +127,7 @@ namespace Twillink.Server.Controllers
             }
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<object> Delete([FromRoute] string id)
         {

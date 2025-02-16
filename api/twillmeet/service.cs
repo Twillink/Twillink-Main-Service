@@ -72,7 +72,8 @@ namespace RepositoryPattern.Services.TwilmeetService
             try
             {
                 var items = await dataUser.Find(_ => _.Id == id).FirstOrDefaultAsync();
-                return new { code = 200, data = items, message = "Data Add Complete" };
+                var payments = await dataPayment.Find(payment => payment.IdItem == id && payment.IsVerification == true).ToListAsync();
+                return new { code = 200, data = items, message = "Data Add Complete", infoMember = payments };
             }
             catch (CustomException)
             {
