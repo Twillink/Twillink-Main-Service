@@ -80,11 +80,24 @@ namespace RepositoryPattern.Services.TwilmeetService
                 throw;
             }
         }
+
+        public async Task<Object> GetMemberWebinar(string id)
+        {
+            try
+            {
+                var payments = await dataPayment.Find(payment => payment.IdItem == id).ToListAsync();
+                return new { code = 200, data = payments, message = "Data Add Complete"};
+            }
+            catch (CustomException)
+            {
+                throw;
+            }
+        }
         public async Task<object> Post(CreateTwilmeetDto item, string idUser)
         {
             try
             {
-                var guid =  Guid.NewGuid().ToString();
+                var guid = Guid.NewGuid().ToString();
                 var TwilmeetData = new Twilmeet()
                 {
                     Id = guid,
@@ -151,28 +164,32 @@ namespace RepositoryPattern.Services.TwilmeetService
                 {
                     throw new CustomException(400, "Error", "Data Not Found");
                 }
-                if (check.IsPaid == true && item.Price < check.Price)
-                {
-                    throw new CustomException(400, "Error", "Not Have Money");
-                }
+                // if (check.IsPaid == true && item.Price < check.Price)
+                // {
+                //     throw new CustomException(400, "Error", "Not Have Money");
+                // }
 
-                var checkUser = await dataListUser.Find(x => x.Id == idUser).FirstOrDefaultAsync();
-                if (checkUser == null)
-                {
-                    throw new CustomException(400, "Error", "Data Not Found");
-                }
+                // var checkUser = await dataListUser.Find(x => x.Id == idUser).FirstOrDefaultAsync();
+                // if (checkUser == null)
+                // {
+                //     throw new CustomException(400, "Error", "Data Not Found");
+                // }
 
                 var TwilmeetData = new Payment()
                 {
                     Id = Guid.NewGuid().ToString(),
-                    IdUser = idUser,
+                    // IdUser = idUser,
                     TypePayment = item.TypePayment,
                     IdItem = item.IdItem,
                     Price = item.Price,
-                    Photo = checkUser.Image,
-                    NameUser = checkUser.Username,
+                    Photo = "",
+                    NameUser = item.FirstName,
+                    LastUser = item.LastName,
+                    Phone = item.Phone,
+                    Email = item.Email,
+                    PasswordRoom = GenerateRandomText(6),
                     IsActive = true,
-                    IsVerification = check.IsPaid == true ? false : true,
+                    IsVerification = false,
                     CreatedAt = DateTime.Now
                 };
                 await dataPayment.InsertOneAsync(TwilmeetData);
@@ -182,6 +199,30 @@ namespace RepositoryPattern.Services.TwilmeetService
             {
                 throw;
             }
+        }
+
+        public async Task<object> PostApproval(string id)
+        {
+            try
+            {
+                var TwilmeetData = await dataPayment.Find(x => x.Id == id).FirstOrDefaultAsync();
+                if (TwilmeetData == null)
+                {
+                    throw new CustomException(400, "Error", "Data Not Found");
+                }
+                TwilmeetData.IsVerification = true;
+                await dataPayment.ReplaceOneAsync(x => x.Id == id, TwilmeetData);
+                return new { code = 200, id = TwilmeetData.Id.ToString(), message = "Data Updated" };
+            }
+            catch (CustomException)
+            {
+                throw;
+            }
+        }
+
+        public static string GenerateRandomText(int length)
+        {
+            return Guid.NewGuid().ToString("N").Substring(0, length);
         }
 
         public async Task<object> Put(string id, CreateTwilmeetDto item)

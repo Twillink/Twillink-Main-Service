@@ -104,6 +104,40 @@ namespace Twillink.Server.Controllers
             }
         }
 
+        [Authorize]
+        [HttpPost("/BuyTweelmeet/{id}")]
+        public async Task<object> PostApprovalBuy([FromRoute] string id)
+        {
+            try
+            {
+                var data = await _ITwilmeetService.PostApproval(id);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("/BuyTweelmeet/{id}")]
+        public async Task<object> GetMember([FromRoute] string id)
+        {
+            try
+            {
+                var data = await _ITwilmeetService.GetMemberWebinar(id);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
         // [Authorize]
         [HttpPut("{id}")]
         public async Task<object> Put([FromRoute] string id, [FromBody] CreateTwilmeetDto item)

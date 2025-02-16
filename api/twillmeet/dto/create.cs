@@ -21,9 +21,11 @@ public class CreateBuyTwilmeetDto
 {
 
         public string? TypePayment { get; set; }
-
+        public string? Email { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Phone { get; set; }
         public string? IdItem { get; set; }
-
         public float? Price { get; set; }
 
 }

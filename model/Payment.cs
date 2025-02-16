@@ -17,6 +17,14 @@ namespace Twillink.Shared.Models
         public string? Photo { get; set; }
         [BsonElement("NameUser")]
         public string? NameUser { get; set; }
+        [BsonElement("LastUser")]
+        public string? LastUser { get; set; }
+         [BsonElement("Email")]
+        public string? Email { get; set; }
+         [BsonElement("Phone")]
+        public string? Phone { get; set; }
+        [BsonElement("PasswordRoom")]
+        public string? PasswordRoom { get; set; }
 
         [BsonElement("IdItem")]
         public string? IdItem { get; set; }
