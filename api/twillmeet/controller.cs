@@ -104,7 +104,7 @@ namespace Twillink.Server.Controllers
             }
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpPost("/BuyTweelmeet/{id}")]
         public async Task<object> PostApprovalBuy([FromRoute] string id)
         {
