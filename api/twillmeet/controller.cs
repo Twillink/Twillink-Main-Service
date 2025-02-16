@@ -80,7 +80,7 @@ namespace Twillink.Server.Controllers
             }
         }
 
-        [HttpPost("/BuyTweelmeet")]
+        [HttpPost("BuyTweelmeet")]
         public async Task<object> PostBuy([FromBody] CreateBuyTwilmeetDto item)
         {
             try
@@ -105,7 +105,7 @@ namespace Twillink.Server.Controllers
         }
 
         [Authorize]
-        [HttpPost("/BuyTweelmeet/{id}")]
+        [HttpPost("BuyTweelmeet/{id}")]
         public async Task<object> PostApprovalBuy([FromRoute] string id)
         {
             try
@@ -122,7 +122,7 @@ namespace Twillink.Server.Controllers
         }
 
         [Authorize]
-        [HttpGet("/BuyTweelmeet/{id}")]
+        [HttpGet("BuyTweelmeet/{id}")]
         public async Task<object> GetMember([FromRoute] string id)
         {
             try
