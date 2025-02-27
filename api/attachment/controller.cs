@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
+using System.IO;
 
 namespace Twillink.Server.Controllers
 {
@@ -86,9 +91,6 @@ namespace Twillink.Server.Controllers
         }
 
 
-
-
-
         [Authorize]
         [HttpPost]
         [RequestSizeLimit(300 * 1024 * 1024)] // 300 MB
@@ -119,10 +121,38 @@ namespace Twillink.Server.Controllers
                 var database = client.GetDatabase("Twillink");
                 var gridFSBucket = new GridFSBucket(database);
 
-                // Upload file to GridFS
+                // Check if file is an image
+                var allowedImageTypes = new[] { "image/jpeg", "image/png", "image/webp" };
+                bool isImage = allowedImageTypes.Contains(file.ContentType);
+
                 ObjectId fileId;
                 using (var stream = file.OpenReadStream())
+                using (var memoryStream = new MemoryStream())
                 {
+                    if (isImage)
+                    {
+                        using (var image = Image.Load(file.OpenReadStream()))
+                        {
+                            // Resize image to 50% of original size
+                            image.Mutate(x => x.Resize(image.Width / 2, image.Height / 2));
+                            var encoder = new JpegEncoder
+                            {
+                                Quality = 20 // Sesuaikan dengan target ukuran (0-100)
+                            };
+
+                            // Save compressed image to memoryStream
+                            image.Save(memoryStream, encoder);
+                            memoryStream.Position = 0;
+                        }
+                    }
+                    else
+                    {
+                        // If not an image, copy the original file
+                        await stream.CopyToAsync(memoryStream);
+                        memoryStream.Position = 0;
+                    }
+
+                    // Upload file to GridFS
                     var options = new GridFSUploadOptions
                     {
                         Metadata = new BsonDocument
@@ -134,7 +164,7 @@ namespace Twillink.Server.Controllers
                 }
                     };
 
-                    fileId = await gridFSBucket.UploadFromStreamAsync(file.FileName, stream, options);
+                    fileId = await gridFSBucket.UploadFromStreamAsync(file.FileName, memoryStream, options);
                 }
 
                 return Ok(new
@@ -156,8 +186,6 @@ namespace Twillink.Server.Controllers
                 return StatusCode(500, new { status = false, message = "An error occurred", details = ex.Message });
             }
         }
-
-
     }
 }
 
