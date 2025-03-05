@@ -36,15 +36,20 @@ namespace RepositoryPattern.Services.TwilmeetService
                 var activeUsers = await dataUser.Find(_ => _.IsActive == true).ToListAsync();
                 // Prepare a dictionary to group payments by user
                 var groupedPayments = new Dictionary<string, List<Payment>>();
+                var groupedNonPayments = new Dictionary<string, List<Payment>>();
+
 
                 // Iterate over active users
                 foreach (var user in activeUsers)
                 {
                     // Fetch payments for the current user
                     var payments = await dataPayment.Find(payment => payment.IdItem == user.Id && payment.IsVerification == true).ToListAsync();
+                    var payments2 = await dataPayment.Find(payment => payment.IdItem == user.Id && payment.IsVerification == false).ToListAsync();
 
                     // Add user and their payments to the dictionary
                     groupedPayments[user.Id] = payments;
+                    groupedNonPayments[user.Id] = payments2;
+
                 }
 
                 // Create the response object
@@ -54,7 +59,8 @@ namespace RepositoryPattern.Services.TwilmeetService
                     Price = user.Price, // Adjust the field based on your model
                     Owner = user.IdUser,
                     InfoItem = user,
-                    Member = groupedPayments.ContainsKey(user.Id) ? groupedPayments[user.Id] : new List<Payment>()
+                    Member = groupedPayments.ContainsKey(user.Id) ? groupedPayments[user.Id] : new List<Payment>(),
+                    NonMember = groupedNonPayments.ContainsKey(user.Id) ? groupedNonPayments[user.Id] : new List<Payment>()
                 });
                 // Return response with the collected results
                 return new { code = 200, data = response, message = "Data fetched successfully." };
