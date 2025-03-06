@@ -61,6 +61,18 @@ namespace SendingEmail
             {
                 return OtpMessage(models.Otp);
             }
+            if (models.Message == "BuyWebinar")
+            {
+                return PostBuyMessage(models);
+            }
+            if (models.Message == "ApprovalWebinar")
+            {
+                return PostApprovalMessage(models);
+            }
+            if (models.Message == "DeclineWebinar")
+            {
+                return PostDeclineMessage(models);
+            }
             return "";
         }
 
@@ -72,6 +84,39 @@ namespace SendingEmail
                     <p>Thank you for registering with us! To complete your registration and activate your account, please click the link below:</p>
                     <p><a href='https://twillink-main-service-158474999909.asia-southeast2.run.app/api/v1/auth/activation/{id}' style='color:#1a73e8; text-decoration:none;'>Activate Your Account</a></p>
                     <p>If you did not request this activation, you can ignore this email.</p>
+                    <p>Best regards,<br>Twillink Team</p>
+                </div>";
+        }
+
+        private String PostBuyMessage(EmailForm data)
+        {
+            return $@"
+                <div style='font-size:14px; font-family:Arial, sans-serif; color:#434343; line-height:1.5;'>
+                    <p>Hello,</p>
+                    <p>Thank you for registering event ( {data.Title} ) from {data.NameUser} , Please wait for admin approval. We will send the event URL shortly.</p>
+                    <p>If you did not request this registration, you can ignore this email.</p>
+                    <p>Best regards,<br>Twillink Team</p>
+                </div>";
+        }
+
+        private String PostApprovalMessage(EmailForm data)
+        {
+            return $@"
+                <div style='font-size:14px; font-family:Arial, sans-serif; color:#434343; line-height:1.5;'>
+                    <p>Hello,</p>
+                    <p>Thank you for joining event ( {data.Title} ) from {data.NameUser} , please click the link below:</p>
+                    <p><a href='{data.URL}' style='color:#1a73e8; text-decoration:none;'>Join Webinar Now</a></p>
+                    <p>Best regards,<br>Twillink Team</p>
+                </div>";
+        }
+
+        private String PostDeclineMessage(EmailForm data)
+        {
+            return $@"
+                <div style='font-size:14px; font-family:Arial, sans-serif; color:#434343; line-height:1.5;'>
+                    <p>Hello,</p>
+                    <p>Admin cancel your joining event ( {data.Title} ) from {data.NameUser} , please click the link below for re-joining event:</p>
+                    <p><a href='{data.URL}' style='color:#1a73e8; text-decoration:none;'>Re-Join Event</a></p>
                     <p>Best regards,<br>Twillink Team</p>
                 </div>";
         }
@@ -99,6 +144,11 @@ namespace SendingEmail
         public string? Subject { get; set; }
         public string? Message { get; set; }
         public string? Otp { get; set; }
+        public string? Password { get; set; }
+        public string? Title { get; set; }
+        public string? URL { get; set; }
+        public string? NameUser { get; set; }
+
     }
 }
 

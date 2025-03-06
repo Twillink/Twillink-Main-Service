@@ -1,5 +1,6 @@
 using System.Globalization;
 using MongoDB.Driver;
+using SendingEmail;
 using Twillink.Shared.Models;
 
 namespace RepositoryPattern.Services.TwilmeetService
@@ -12,19 +13,23 @@ namespace RepositoryPattern.Services.TwilmeetService
 
         private readonly IWidgetService _IWidgetService;
 
+        private readonly IEmailService emailService; 
+
 
         private readonly string key;
 
-        public TwilmeetService(IConfiguration configuration, IWidgetService roleService)
+        public string Id { get; private set; }
+        public string? Email { get; private set; }
+
+        public TwilmeetService(IConfiguration configuration, IWidgetService roleService, IEmailService emailServices)
         {
             _IWidgetService = roleService;
+            emailService = emailServices;
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
             IMongoDatabase database = client.GetDatabase("Twillink");
             dataUser = database.GetCollection<Twilmeet>("Twilmeets");
             dataPayment = database.GetCollection<Payment>("Payments");
             dataListUser = database.GetCollection<User>("Users");
-
-
             this.key = configuration.GetSection("AppSettings")["JwtKey"];
         }
 
@@ -173,10 +178,16 @@ namespace RepositoryPattern.Services.TwilmeetService
                     throw new CustomException(400, "Error", "Data Not Found");
                 }
 
-                var check2 = await dataPayment.Find(x => x.Email == item.Email && x.IdItem == item.IdItem).FirstOrDefaultAsync();
-                if (check2 != null)
+                var check23 = await dataPayment.Find(x => x.Email == item.Email && x.IdItem == item.IdItem).FirstOrDefaultAsync();
+                if (check23 != null)
                 {
                     throw new CustomException(400, "Error", "Your email is already registered for this event, Please use a different email.");
+                }
+
+                var check2 = await dataListUser.Find(x => x.Id == check.IdUser).FirstOrDefaultAsync();
+                if (check2 == null)
+                {
+                    throw new CustomException(400, "Error", "Data Not Found");
                 }
                 // if (check.IsPaid == true && item.Price < check.Price)
                 // {
@@ -188,10 +199,11 @@ namespace RepositoryPattern.Services.TwilmeetService
                 // {
                 //     throw new CustomException(400, "Error", "Data Not Found");
                 // }
-
+                var guidnew = Guid.NewGuid().ToString();
+                var pss = GenerateRandomText(6);
                 var TwilmeetData = new Payment()
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = guidnew,
                     // IdUser = idUser,
                     TypePayment = item.TypePayment,
                     IdItem = item.IdItem,
@@ -201,11 +213,24 @@ namespace RepositoryPattern.Services.TwilmeetService
                     LastUser = item.LastName,
                     Phone = item.Phone,
                     Email = item.Email,
-                    PasswordRoom = GenerateRandomText(6),
+                    PasswordRoom = pss,
                     IsActive = true,
                     IsVerification = false,
                     CreatedAt = DateTime.Now
                 };
+
+                var EmailSend = new EmailForm()
+                {
+                    Id = guidnew,
+                    Email = item.Email,
+                    Subject = "Join Event",
+                    Message = "BuyWebinar",
+                    Password = pss,
+                    Title = check.Title,
+                    URL = "",
+                    NameUser = check2.Username,
+                };
+                await emailService.SendEmailAsync(EmailSend);
                 await dataPayment.InsertOneAsync(TwilmeetData);
                 return new { code = 200, id = TwilmeetData.Id, message = "Data Add Complete" };
             }
@@ -224,7 +249,33 @@ namespace RepositoryPattern.Services.TwilmeetService
                 {
                     throw new CustomException(400, "Error", "Data Not Found");
                 }
+
+                var check = await dataUser.Find(x => x.Id == TwilmeetData.IdItem).FirstOrDefaultAsync();
+                if (check == null)
+                {
+                    throw new CustomException(400, "Error", "Data Not Found");
+                }
+
+                var check2 = await dataListUser.Find(x => x.Id == check.IdUser).FirstOrDefaultAsync();
+                if (check2 == null)
+                {
+                    throw new CustomException(400, "Error", "Data Not Found");
+                }
+
                 TwilmeetData.IsVerification = true;
+
+                var EmailSend = new EmailForm()
+                {
+                    Id = TwilmeetData.IdItem,
+                    Email = TwilmeetData.Email,
+                    Subject = "Approval Event",
+                    Message = "ApprovalWebinar",
+                    Password = TwilmeetData.PasswordRoom,
+                    Title = check.Title,
+                    NameUser = check2.Username,
+                    URL = "https://twillink.com/room?id=" + check2.CodeMeeting
+                };
+                await emailService.SendEmailAsync(EmailSend);
                 await dataPayment.ReplaceOneAsync(x => x.Id == id, TwilmeetData);
                 return new { code = 200, id = TwilmeetData.Id.ToString(), message = "Data Updated" };
             }
@@ -243,8 +294,33 @@ namespace RepositoryPattern.Services.TwilmeetService
                 {
                     throw new CustomException(400, "Error", "Data Not Found");
                 }
+
+                var check = await dataUser.Find(x => x.Id == TwilmeetData.IdItem).FirstOrDefaultAsync();
+                if (check == null)
+                {
+                    throw new CustomException(400, "Error", "Data Not Found");
+                }
+
+                var check2 = await dataListUser.Find(x => x.Id == check.IdUser).FirstOrDefaultAsync();
+                if (check2 == null)
+                {
+                    throw new CustomException(400, "Error", "Data Not Found");
+                }
+
                 TwilmeetData.IsActive = false;
                 TwilmeetData.IsVerification = false;
+                var EmailSend = new EmailForm()
+                {
+                    Id = TwilmeetData.IdItem,
+                    Email = TwilmeetData.Email,
+                    Subject = "Decline Event",
+                    Message = "DeclineWebinar",
+                    Password = TwilmeetData.PasswordRoom,
+                    Title = check.Title,
+                    NameUser = check2.Username,
+                    URL = "https://twillink.com/webinar?id=" + TwilmeetData.IdItem
+                };
+                await emailService.SendEmailAsync(EmailSend);
                 await dataPayment.ReplaceOneAsync(x => x.Id == id, TwilmeetData);
                 return new { code = 200, id = TwilmeetData.Id.ToString(), message = "Data Updated" };
             }
