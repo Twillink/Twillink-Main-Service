@@ -43,8 +43,8 @@ namespace RepositoryPattern.Services.TwilmeetService
                 foreach (var user in activeUsers)
                 {
                     // Fetch payments for the current user
-                    var payments = await dataPayment.Find(payment => payment.IdItem == user.Id && payment.IsVerification == true).ToListAsync();
-                    var payments2 = await dataPayment.Find(payment => payment.IdItem == user.Id && payment.IsVerification == false).ToListAsync();
+                    var payments = await dataPayment.Find(payment => payment.IdItem == user.Id && payment.IsVerification == true && payment.IsActive == true).ToListAsync();
+                    var payments2 = await dataPayment.Find(payment => payment.IdItem == user.Id && payment.IsVerification == false && payment.IsActive == true).ToListAsync();
 
                     // Add user and their payments to the dictionary
                     groupedPayments[user.Id] = payments;
@@ -79,7 +79,9 @@ namespace RepositoryPattern.Services.TwilmeetService
             {
                 var items = await dataUser.Find(_ => _.Id == id).FirstOrDefaultAsync();
                 var payments = await dataPayment.Find(payment => payment.IdItem == id && payment.IsVerification == true).ToListAsync();
-                return new { code = 200, data = items, message = "Data Add Complete", infoMember = payments };
+                var nonpayments = await dataPayment.Find(payment => payment.IdItem == id && payment.IsVerification == false && payment.IsActive == true).ToListAsync();
+
+                return new { code = 200, data = items, message = "Data Add Complete", Member = payments, NonMember = nonpayments };
             }
             catch (CustomException)
             {
