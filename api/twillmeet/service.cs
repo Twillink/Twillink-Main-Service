@@ -171,10 +171,10 @@ namespace RepositoryPattern.Services.TwilmeetService
                     throw new CustomException(400, "Error", "Data Not Found");
                 }
 
-                var check2 = await dataPayment.Find(x => x.Email == item.Email && x.Id == item.IdItem).FirstOrDefaultAsync();
+                var check2 = await dataPayment.Find(x => x.Email == item.Email && x.IdItem == item.IdItem).FirstOrDefaultAsync();
                 if (check2 != null)
                 {
-                    throw new CustomException(400, "Error", "Data found, Please use another email");
+                    throw new CustomException(400, "Error", "Your email is already registered for this event, Please use a different email.");
                 }
                 // if (check.IsPaid == true && item.Price < check.Price)
                 // {
