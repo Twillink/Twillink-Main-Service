@@ -97,12 +97,29 @@ namespace Twillink.Server.Controllers
         }
 
         [Authorize]
-        [HttpPost("BuyTweelmeet/{id}")]
+        [HttpPost("Approval/{id}")]
         public async Task<object> PostApprovalBuy([FromRoute] string id)
         {
             try
             {
                 var data = await _ITwilmeetService.PostApproval(id);
+                return Ok(data);
+            }
+            catch (CustomException ex)
+            {
+                int errorCode = ex.ErrorCode;
+                var errorResponse = new ErrorResponse(errorCode, ex.ErrorHeader, ex.Message);
+                return _errorUtility.HandleError(errorCode, errorResponse);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("Decline/{id}")]
+        public async Task<object> PostDeclineBuy([FromRoute] string id)
+        {
+            try
+            {
+                var data = await _ITwilmeetService.PostDecline(id);
                 return Ok(data);
             }
             catch (CustomException ex)

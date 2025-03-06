@@ -170,6 +170,12 @@ namespace RepositoryPattern.Services.TwilmeetService
                 {
                     throw new CustomException(400, "Error", "Data Not Found");
                 }
+
+                var check2 = await dataPayment.Find(x => x.Email == item.Email && x.Id == item.IdItem).FirstOrDefaultAsync();
+                if (check2 != null)
+                {
+                    throw new CustomException(400, "Error", "Data found, Please use another email");
+                }
                 // if (check.IsPaid == true && item.Price < check.Price)
                 // {
                 //     throw new CustomException(400, "Error", "Not Have Money");
@@ -217,6 +223,26 @@ namespace RepositoryPattern.Services.TwilmeetService
                     throw new CustomException(400, "Error", "Data Not Found");
                 }
                 TwilmeetData.IsVerification = true;
+                await dataPayment.ReplaceOneAsync(x => x.Id == id, TwilmeetData);
+                return new { code = 200, id = TwilmeetData.Id.ToString(), message = "Data Updated" };
+            }
+            catch (CustomException)
+            {
+                throw;
+            }
+        }
+
+        public async Task<object> PostDecline(string id)
+        {
+            try
+            {
+                var TwilmeetData = await dataPayment.Find(x => x.Id == id).FirstOrDefaultAsync();
+                if (TwilmeetData == null)
+                {
+                    throw new CustomException(400, "Error", "Data Not Found");
+                }
+                TwilmeetData.IsActive = false;
+                TwilmeetData.IsVerification = false;
                 await dataPayment.ReplaceOneAsync(x => x.Id == id, TwilmeetData);
                 return new { code = 200, id = TwilmeetData.Id.ToString(), message = "Data Updated" };
             }
