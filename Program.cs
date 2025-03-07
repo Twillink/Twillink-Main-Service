@@ -172,6 +172,14 @@ app.Use(async (context, next) =>
             await context.Response.WriteAsync(json);
         }
     });
+
+app.Use(async (context, next) =>
+{
+    context.Request.EnableBuffering(); // Memungkinkan request dibaca ulang jika perlu
+    await next();
+});
+
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
