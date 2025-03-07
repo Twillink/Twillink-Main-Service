@@ -172,7 +172,7 @@ namespace Twillink.Server.Controllers
                     status = true,
                     message = "File uploaded successfully",
                     fileId = fileId.ToString(),
-                    path = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/api/v1/Attachment/Download/{fileId}"
+                    path = $"https://twillink.coderchamps.co.id/api/v1/Attachment/Download/{fileId}"
                 });
             }
             catch (CustomException ex)
